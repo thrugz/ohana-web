@@ -20,3 +20,12 @@
 - Fraunces: always `fontWeight: 400`, never 700+. Use `fontVariationSettings: '"opsz" 144'` at display sizes
 - All colour tokens are in `app/globals.css` under `@theme inline {}` — do not hardcode hex values
 - Scroll-driven animations: `@supports (animation-timeline: view())` block in globals.css + IntersectionObserver fallback in `components/ScrollReveal.tsx`
+
+## next/og (ImageResponse)
+- Do NOT use `export const runtime = "edge"` — crashes Turbopack dev silently (empty reply). Node.js runtime works.
+- Satori doesn't support `userSelect` or `inset` shorthand CSS. Pass `Buffer` directly to `fonts[].data`, not `data.buffer as ArrayBuffer`.
+- Load fonts with `readFile` from `node:fs/promises` (file in `public/fonts/`) — Google Fonts fetch hangs unreliably in OG routes.
+
+## Scroll animations
+- Prefer `data-reveal="toss"` (CSS `animation-timeline: view()`) over `useInView` + spring for scroll-linked feel.
+- Adding a new `data-reveal` variant needs three edits: observer selector in `ScrollReveal.tsx`, `@supports not` fallback, `@media (prefers-reduced-motion)` block.

@@ -1,5 +1,20 @@
 # Changelog
 
+## [v0.2.0] — 2026-05-14
+
+### Features
+
+- **OG image** — `app/opengraph-image.tsx` with Fraunces italic, ghost watermark, clay top bar, destination pills; font loaded from `public/fonts/fraunces-italic.ttf` via `readFile` (Node.js runtime — edge runtime crashes Turbopack dev)
+- **TossReveal** — `components/TossReveal.tsx` scroll-linked panel entrance using CSS `animation-timeline: view()` (Chromium) with IntersectionObserver fallback; applied to bento tiles, press cards, HowItWorks steps, testimonial cards, neighbourhood photo cards
+- **Bento tile illustrations** — per-tile inline components: ExperienceCard, NeighborhoodPins (SVG grid + pulsing dots), CompanionAvatars, ItineraryList, OfflineBadge
+- **GetTheApp section** — phone mockup with fake status bar and itinerary content, QR code (qrcode.react), App Store + Google Play buttons with spring hover
+- **Press strip** — 4-card grid: Condé Nast Traveller, Monocle, Travel + Leisure, Wallpaper*
+
+### Fixes
+
+- Scroll reveal feel: replaced `useInView` + spring (fires independently of scroll) with `data-reveal="toss"` CSS scroll-driven animation for panels that track scroll position
+- OG image: removed unsupported Satori CSS (`userSelect`, `inset` shorthand); pass `Buffer` directly to `fonts[].data`
+
 ## [v0.1.0] — 2026-05-14
 
 Initial build of the Ohana marketing site.

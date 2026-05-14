@@ -39,7 +39,7 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3100
 npx tsc --noEmit   # type-check
 ```
 
