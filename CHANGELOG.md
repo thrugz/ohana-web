@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.3.0] — 2026-05-14
+
+### Features
+
+- **OpenStreetMap** — real Leaflet map in DemoStrip replacing fake CSS grid; CartoDB Positron tiles, branded pill markers for Alfama, Príncipe Real, LX Factory; loaded with `ssr: false` dynamic import
+- **Auto-scroll neighbourhood strip** — 12 destinations (up from 6) with RAF-based infinite loop at 0.55 px/frame; pauses on hover/drag; seamless reset at the halfway point of a duplicated array
+- **Unsplash photos** — all 12 neighbourhood cards and 5 site hero images replaced with real Unsplash photos via `scripts/fetch-unsplash.mjs`
+
+### Fixes
+
+- Neighbourhood card hover clip: `overflow-x: scroll` was forcing `overflow-y: auto` and clipping upward hover animation — fixed with `pt-4` padding buffer on the scroll container
+
 ## [v0.2.0] — 2026-05-14
 
 ### Features

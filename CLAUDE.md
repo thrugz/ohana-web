@@ -29,3 +29,15 @@
 ## Scroll animations
 - Prefer `data-reveal="toss"` (CSS `animation-timeline: view()`) over `useInView` + spring for scroll-linked feel.
 - Adding a new `data-reveal` variant needs three edits: observer selector in `ScrollReveal.tsx`, `@supports not` fallback, `@media (prefers-reduced-motion)` block.
+
+## Leaflet / react-leaflet
+- Always load with `dynamic(() => import(...), { ssr: false })` — Leaflet accesses `window` at import time and crashes SSR.
+- Default marker icons break in Next.js; patch with `delete L.Icon.Default.prototype._getIconUrl` + `L.Icon.Default.mergeOptions(...)` in a `useEffect`.
+- CartoDB Positron tiles (`https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png`, subdomains `abcd`) give a clean minimal aesthetic matching the brand.
+
+## Scroll container hover clip
+- `overflow-x: scroll` forces `overflow-y: auto` per CSS spec — cards animated upward with `whileHover={{ y: -N }}` will be clipped. Fix: add `pt-4` (or sufficient padding-top) to the scroll container so the overflow is inside the padding box.
+
+## Coolify deployment
+- Coolify cannot clone private GitHub repos without GitHub App auth configured — make the repo public or set up the GitHub App integration.
+- `COOLIFY_TOKEN` is not available in the shell env; use MCP Coolify tools for all API calls (curl with `$COOLIFY_TOKEN` returns 401).

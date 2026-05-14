@@ -12,6 +12,7 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 | Styles | Tailwind CSS v4 — CSS-first `@theme` config, no tailwind.config.js |
 | Components | shadcn/ui (uses `@base-ui/react`, not Radix) |
 | Animation | Motion (`motion/react`) + native CSS `animation-timeline: view()` |
+| Map | Leaflet + react-leaflet, CartoDB Positron tiles, `ssr: false` dynamic import |
 | Fonts | Fraunces (variable, axes: opsz/SOFT/WONK) + Inter via `next/font/google` |
 | Colour | OKLCH perceptual scale — canvas, clay (#C56A3F), sage, ink |
 
@@ -45,4 +46,8 @@ npx tsc --noEmit   # type-check
 
 ## Project photos
 
-Destination photos live in `public/`: `bali.jpg`, `alentejo.jpg`, `kyoto.jpg`, `marrakech.jpg`, `sacred-valley.jpg`.
+Hero/destination photos live in `public/`: `bali.jpg`, `alentejo.jpg`, `kyoto.jpg`, `marrakech.jpg`, `sacred-valley.jpg`.
+
+Neighbourhood card photos live in `public/neighborhoods/` (12 portrait-oriented JPEGs from Unsplash): `alfama`, `shimokitazawa`, `roma-norte`, `croix-rousse`, `sacred-valley`, `yeonnam-dong`, `pigneto`, `hauz-khas`, `le-marais`, `williamsburg`, `fushimi`, `paarel`.
+
+To refresh photos: `node scripts/fetch-unsplash.mjs` (requires Unsplash API key in script).
