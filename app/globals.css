@@ -65,6 +65,10 @@ body {
   from { opacity: 0; transform: translateY(36px) rotate(var(--tilt, 2deg)); }
   to   { opacity: 1; transform: translateY(0) rotate(0deg); }
 }
+@keyframes toss-in {
+  from { opacity: 0; transform: translateY(44px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 /* Native scroll-driven (Chromium only — progressive enhancement) */
 @supports (animation-timeline: view()) {
@@ -83,20 +87,27 @@ body {
     animation-timeline: view();
     animation-range: entry 0% cover 25%;
   }
+  [data-reveal="toss"] {
+    animation: toss-in 0.7s var(--ease-out) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 32%;
+  }
 }
 
 /* Safari/Firefox fallback via IntersectionObserver */
 @supports not (animation-timeline: view()) {
   [data-reveal],
   [data-reveal="pop"],
-  [data-reveal="tilt"] {
+  [data-reveal="tilt"],
+  [data-reveal="toss"] {
     opacity: 0;
-    transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+    transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
   }
-  [data-reveal]            { transform: translateY(28px); }
-  [data-reveal="pop"]      { transform: scale(0.86); }
-  [data-reveal="tilt"]     { transform: translateY(36px) rotate(var(--tilt, 2deg)); }
-  [data-revealed="true"]   { opacity: 1 !important; transform: none !important; }
+  [data-reveal]              { transform: translateY(28px); }
+  [data-reveal="pop"]        { transform: scale(0.86); }
+  [data-reveal="tilt"]       { transform: translateY(36px) rotate(var(--tilt, 2deg)); }
+  [data-reveal="toss"]       { transform: translateY(44px); }
+  [data-revealed="true"]     { opacity: 1 !important; transform: none !important; }
 }
 
 /* Stagger helpers */
@@ -152,7 +163,8 @@ body {
   }
   [data-reveal],
   [data-reveal="pop"],
-  [data-reveal="tilt"] {
+  [data-reveal="tilt"],
+  [data-reveal="toss"] {
     opacity: 1 !important;
     transform: none !important;
   }

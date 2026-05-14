@@ -9,7 +9,7 @@ export function ScrollReveal() {
     const supportsScrollTimeline = CSS.supports("animation-timeline", "view()")
     if (supportsScrollTimeline) return
 
-    const els = document.querySelectorAll("[data-reveal], [data-reveal='pop'], [data-reveal='tilt']")
+    const els = document.querySelectorAll("[data-reveal], [data-reveal='pop'], [data-reveal='tilt'], [data-reveal='toss']")
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {

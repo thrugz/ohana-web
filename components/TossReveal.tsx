@@ -1,9 +1,6 @@
 "use client"
 
-import { motion, useInView } from "motion/react"
-import { useRef, type ReactNode, type CSSProperties } from "react"
-
-const SPRING = { type: "spring" as const, stiffness: 220, damping: 14, mass: 1 }
+import { useEffect, useRef, type ReactNode, type CSSProperties } from "react"
 
 interface Props {
   children: ReactNode
@@ -14,18 +11,20 @@ interface Props {
 
 export function TossReveal({ children, delay = 0, className, style }: Props) {
   const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, margin: "-5% 0px" })
+
+  useEffect(() => {
+    if (!ref.current || !delay) return
+    ref.current.style.animationDelay = `${delay}s`
+  }, [delay])
 
   return (
-    <motion.div
+    <div
       ref={ref}
+      data-reveal="toss"
       className={className}
       style={style}
-      initial={{ opacity: 0, y: 56, rotate: 1.5 }}
-      animate={inView ? { opacity: 1, y: 0, rotate: 0 } : {}}
-      transition={{ ...SPRING, delay }}
     >
       {children}
-    </motion.div>
+    </div>
   )
 }
