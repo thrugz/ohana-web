@@ -4,6 +4,7 @@ import { MarqueeTicker } from "./_components/MarqueeTicker"
 import { DemoStrip } from "./_components/DemoStrip"
 import { FeatureBento } from "./_components/FeatureBento"
 import { HowItWorks } from "./_components/HowItWorks"
+import { GetTheApp } from "./_components/GetTheApp"
 import { DiscoverScroll } from "./_components/DiscoverScroll"
 import { Companions } from "./_components/Companions"
 import { PressStrip } from "./_components/PressStrip"
@@ -24,6 +25,7 @@ export default function HomePage() {
       <DemoStrip />
       <FeatureBento />
       <HowItWorks />
+      <GetTheApp />
       <DiscoverScroll />
       <Companions />
       <PressStrip />
