@@ -1,0 +1,159 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* Ohana brand tokens */
+  --color-canvas:      oklch(0.97 0.012 80);
+  --color-surface:     oklch(0.99 0.005 80);
+  --color-ink:         oklch(0.22 0.02 60);
+  --color-muted:       oklch(0.55 0.015 60);
+  --color-clay:        oklch(0.62 0.14 45);
+  --color-clay-soft:   oklch(0.92 0.04 45);
+  --color-clay-glow:   oklch(0.62 0.14 45 / 0.18);
+  --color-sage:        oklch(0.74 0.04 145);
+  --color-sage-soft:   oklch(0.93 0.02 145);
+  --color-line:        oklch(0.92 0.01 80);
+
+  --color-background:  var(--color-canvas);
+  --color-foreground:  var(--color-ink);
+  --color-border:      var(--color-line);
+  --color-ring:        var(--color-clay);
+  --color-primary:     var(--color-clay);
+  --color-primary-foreground: oklch(1 0 0);
+
+  --font-sans:   var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif:  var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono:   ui-monospace, monospace;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius:    0.875rem;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snappy: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+/* ── Scroll reveal keyframes ─────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.86); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes tilt-in {
+  from { opacity: 0; transform: translateY(36px) rotate(var(--tilt, 2deg)); }
+  to   { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+/* Native scroll-driven (Chromium only — progressive enhancement) */
+@supports (animation-timeline: view()) {
+  [data-reveal] {
+    animation: fade-up 0.65s var(--ease-out) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+  [data-reveal="pop"] {
+    animation: pop-in 0.5s var(--ease-spring) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 22%;
+  }
+  [data-reveal="tilt"] {
+    animation: tilt-in 0.7s var(--ease-spring) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 25%;
+  }
+}
+
+/* Safari/Firefox fallback via IntersectionObserver */
+@supports not (animation-timeline: view()) {
+  [data-reveal],
+  [data-reveal="pop"],
+  [data-reveal="tilt"] {
+    opacity: 0;
+    transition: opacity 0.65s var(--ease-out), transform 0.65s var(--ease-out);
+  }
+  [data-reveal]            { transform: translateY(28px); }
+  [data-reveal="pop"]      { transform: scale(0.86); }
+  [data-reveal="tilt"]     { transform: translateY(36px) rotate(var(--tilt, 2deg)); }
+  [data-revealed="true"]   { opacity: 1 !important; transform: none !important; }
+}
+
+/* Stagger helpers */
+[data-stagger] > *:nth-child(1) { animation-delay:   0ms; }
+[data-stagger] > *:nth-child(2) { animation-delay:  70ms; }
+[data-stagger] > *:nth-child(3) { animation-delay: 140ms; }
+[data-stagger] > *:nth-child(4) { animation-delay: 210ms; }
+[data-stagger] > *:nth-child(5) { animation-delay: 280ms; }
+[data-stagger] > *:nth-child(6) { animation-delay: 350ms; }
+
+/* Ambient tile float */
+@keyframes tile-float {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-5px); }
+}
+
+/* Clay pulse */
+@keyframes clay-pulse {
+  0%, 100% { box-shadow: 0 0 0 0   var(--color-clay-glow); }
+  50%       { box-shadow: 0 0 0 12px transparent; }
+}
+
+/* Hairline draw */
+@keyframes draw-line {
+  from { transform: scaleX(0); transform-origin: left center; }
+  to   { transform: scaleX(1); }
+}
+
+/* Marquee */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Blink cursor */
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Confetti burst particle */
+@keyframes confetti-fly {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.4) rotate(var(--r)); }
+}
+
+/* Reduce motion — kill everything except opacity */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:       0.01ms !important;
+    animation-iteration-count: 1     !important;
+    transition-duration:      0.01ms !important;
+  }
+  [data-reveal],
+  [data-reveal="pop"],
+  [data-reveal="tilt"] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
