@@ -154,6 +154,18 @@ body {
   100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.4) rotate(var(--r)); }
 }
 
+/* Leaflet map pane */
+.leaflet-map-pane {
+  border-radius: inherit;
+}
+.leaflet-control-attribution {
+  font-size: 9px !important;
+  opacity: 0.5;
+}
+.leaflet-container {
+  font-family: var(--font-sans) !important;
+}
+
 /* Reduce motion — kill everything except opacity */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

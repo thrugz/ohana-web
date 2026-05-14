@@ -2,15 +2,13 @@
 
 import { useEffect, useRef, useState } from "react"
 import { motion, useInView } from "motion/react"
+import dynamic from "next/dynamic"
+
+const MapPane = dynamic(() => import("@/components/MapPane").then((m) => m.MapPane), { ssr: false })
 
 const REPLY =
   "Here's what I'd do: start Saturday morning in Alfama — coffee at Pois, walk the alleys before the crowds. Afternoon in Príncipe Real for the antique market. Evening in LX Factory — dinner at Taberna da Rua das Flores. Sunday is yours to slow down."
 
-const PINS = [
-  { label: "Alfama", style: { top: "26%", left: "14%" } },
-  { label: "Príncipe Real", style: { top: "50%", left: "38%" } },
-  { label: "LX Factory", style: { top: "68%", left: "62%" } },
-]
 
 export function DemoStrip() {
   const ref = useRef<HTMLDivElement>(null)
@@ -88,44 +86,10 @@ export function DemoStrip() {
       {/* Map side */}
       <div
         className="relative overflow-hidden rounded-2xl border border-[var(--color-line)]"
-        style={{ aspectRatio: "4/3", background: "linear-gradient(135deg, #E8E2D8, #D4CEC6)" }}
+        style={{ aspectRatio: "4/3" }}
         data-cursor="photo"
       >
-        {/* Subtle grid */}
-        <div
-          className="absolute inset-0 opacity-30"
-          style={{
-            backgroundImage: `
-              linear-gradient(var(--color-line) 1px, transparent 1px),
-              linear-gradient(90deg, var(--color-line) 1px, transparent 1px)
-            `,
-            backgroundSize: "40px 40px",
-          }}
-        />
-
-        {PINS.map((pin, i) => (
-          <motion.div
-            key={pin.label}
-            initial={{ opacity: 0, y: -16, scale: 0 }}
-            animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-            transition={{
-              delay: 0.8 + i * 0.2,
-              duration: 0.45,
-              type: "spring",
-              stiffness: 400,
-              damping: 18,
-            }}
-            whileHover={{ y: -4, scale: 1.06 }}
-            className="absolute flex cursor-default items-center gap-1.5 rounded-full border border-[var(--color-line)] bg-white px-2.5 py-1.5 text-[12px] shadow-md"
-            style={{ ...pin.style, color: "var(--color-ink)" }}
-          >
-            <span
-              className="h-2 w-2 rounded-full flex-shrink-0"
-              style={{ background: "var(--color-clay)" }}
-            />
-            {pin.label}
-          </motion.div>
-        ))}
+        <MapPane />
       </div>
     </div>
   )
