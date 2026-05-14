@@ -1,3 +1,7 @@
+"use client"
+
+import { TossReveal } from "@/components/TossReveal"
+
 const testimonials = [
   {
     name: "Maya",
@@ -46,11 +50,11 @@ export function Companions() {
         What travelers say.
       </h2>
 
-      <div className="grid gap-6 md:grid-cols-3" data-stagger>
-        {testimonials.map((t) => (
-          <div
+      <div className="grid gap-6 md:grid-cols-3">
+        {testimonials.map((t, i) => (
+          <TossReveal
             key={t.name}
-            data-reveal
+            delay={i * 0.08}
             className="rounded-2xl border border-[var(--color-line)] p-7"
             style={{ background: "var(--color-surface)" }}
           >
@@ -84,7 +88,7 @@ export function Companions() {
             >
               "{t.quote}"
             </blockquote>
-          </div>
+          </TossReveal>
         ))}
       </div>
     </section>

@@ -2,6 +2,7 @@
 
 import { useRef } from "react"
 import { motion, useInView } from "motion/react"
+import { TossReveal } from "@/components/TossReveal"
 
 const steps = [
   {
@@ -66,15 +67,9 @@ export function HowItWorks() {
         />
 
         {steps.map((step, i) => (
-          <motion.div
+          <TossReveal
             key={step.num}
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              delay: 0.15 + i * 0.12,
-              duration: 0.55,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            delay={0.15 + i * 0.12}
             className="group border-t border-[var(--color-line)] pt-8 px-5 pb-2 first:pl-0 last:pr-0 md:border-t-0 md:pt-0"
           >
             <motion.div
@@ -109,7 +104,7 @@ export function HowItWorks() {
             <p className="text-[14px] leading-[1.75]" style={{ color: "var(--color-muted)" }}>
               {step.body}
             </p>
-          </motion.div>
+          </TossReveal>
         ))}
       </div>
     </section>

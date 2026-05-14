@@ -2,6 +2,7 @@
 
 import { useRef } from "react"
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from "motion/react"
+import { TossReveal } from "@/components/TossReveal"
 import Image from "next/image"
 
 const NEIGHBORHOODS = [
@@ -83,17 +84,19 @@ function NeighborhoodCard({
   index: number
 }) {
   return (
+    <TossReveal
+      delay={index * 0.07}
+      style={{ width: 280, height: 380, flexShrink: 0, scrollSnapAlign: "start" }}
+    >
     <motion.div
-      data-reveal="tilt"
       whileHover={{ y: -8, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 350, damping: 22 }}
-      className="relative flex-shrink-0 overflow-hidden rounded-2xl"
+      className="relative overflow-hidden rounded-2xl"
       style={{
         "--tilt": `${neighborhood.tilt}deg`,
-        width: 280,
-        height: 380,
-        scrollSnapAlign: "start",
-        animationDelay: `${index * 80}ms`,
+        width: "100%",
+        height: "100%",
+        position: "relative",
       } as React.CSSProperties}
       data-cursor="photo"
     >
@@ -128,5 +131,6 @@ function NeighborhoodCard({
         <p className="text-[12px] leading-relaxed text-white/60">{neighborhood.line}</p>
       </div>
     </motion.div>
+    </TossReveal>
   )
 }

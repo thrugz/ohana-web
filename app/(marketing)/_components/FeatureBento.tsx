@@ -2,6 +2,7 @@
 
 import { useRef } from "react"
 import { motion, useMotionValue, useSpring } from "motion/react"
+import { TossReveal } from "@/components/TossReveal"
 
 const tiles = [
   {
@@ -246,10 +247,9 @@ function BentoTile({ tile }: { tile: (typeof tiles)[0] }) {
     <motion.div
       ref={ref}
       onMouseMove={onMouseMove}
-      data-reveal="pop"
       whileHover={{ y: -6, scale: 1.01 }}
       transition={{ type: "spring", stiffness: 380, damping: 20 }}
-      className={`relative overflow-hidden rounded-[24px] p-8 ${tile.span}`}
+      className="relative overflow-hidden rounded-[24px] p-8 h-full"
       style={{
         background: tile.bg,
         border: tile.dark ? "none" : "1px solid var(--color-line)",
@@ -328,8 +328,10 @@ export function FeatureBento() {
       </div>
 
       <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
-        {tiles.map((tile) => (
-          <BentoTile key={tile.id} tile={tile} />
+        {tiles.map((tile, index) => (
+          <TossReveal key={tile.id} className={tile.span} delay={index * 0.06}>
+            <BentoTile tile={tile} />
+          </TossReveal>
         ))}
       </div>
     </section>
