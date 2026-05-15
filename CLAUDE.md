@@ -24,6 +24,8 @@
 ## next/og (ImageResponse)
 - Do NOT use `export const runtime = "edge"` — crashes Turbopack dev silently (empty reply). Node.js runtime works.
 - Satori doesn't support `userSelect` or `inset` shorthand CSS. Pass `Buffer` directly to `fonts[].data`, not `data.buffer as ArrayBuffer`.
+- Satori rejects `width: "fit-content"` (build warning, ignored value). To shrink-wrap a flex item use `alignSelf: "flex-start"` instead.
+- Set `metadataBase` in the root `app/layout.tsx` metadata (`new URL("https://ohana.travel")`) or OG/Twitter image URLs fall back to `localhost:3000`.
 - Load fonts with `readFile` from `node:fs/promises` (file in `public/fonts/`) — Google Fonts fetch hangs unreliably in OG routes.
 
 ## Scroll animations

@@ -69,7 +69,7 @@ export default function NotFound() {
             color: "var(--color-ink)",
           }}
         >
-          This page doesn't<br />exist. Yet.
+          This page doesn&apos;t<br />exist. Yet.
         </motion.h1>
 
         <motion.p

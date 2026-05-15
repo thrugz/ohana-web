@@ -151,7 +151,7 @@ export default async function Image() {
               border: "1px solid rgba(197,106,63,0.25)",
               borderRadius: 100,
               padding: "8px 16px",
-              width: "fit-content",
+              alignSelf: "flex-start",
             }}
           >
             <div

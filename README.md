@@ -35,6 +35,7 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 - Scroll-driven animations use `@supports (animation-timeline: view())` with IntersectionObserver fallback in `components/ScrollReveal.tsx` for Safari/Firefox
 - Page transitions via `app/(marketing)/template.tsx` (re-mounts on every navigation)
 - Design tokens live in `app/globals.css` under `@theme inline {}`
+- `FeedbackWidget` (global, in root layout) — floating button captures a screenshot + page URL and files a Linear issue in the Ohana project via `/api/feedback`
 
 ## Dev
 

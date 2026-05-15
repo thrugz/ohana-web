@@ -86,7 +86,7 @@ export function Companions() {
                 lineHeight: 1.65,
               }}
             >
-              "{t.quote}"
+              &ldquo;{t.quote}&rdquo;
             </blockquote>
           </TossReveal>
         ))}

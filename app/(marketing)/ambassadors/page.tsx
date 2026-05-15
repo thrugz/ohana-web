@@ -202,7 +202,7 @@ function WhatIsAmbassador() {
             style={{ color: "var(--color-muted)" }}
           >
             You already do it naturally — sending voice notes about that one restaurant, texting
-            "you have to go here" before someone's trip. As an Ohana Ambassador, that instinct
+            &ldquo;you have to go here&rdquo; before someone&apos;s trip. As an Ohana Ambassador, that instinct
             becomes something more. Your recommendations carry more weight, and you get the credit
             they deserve.
           </motion.p>

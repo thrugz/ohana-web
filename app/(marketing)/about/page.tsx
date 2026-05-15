@@ -131,8 +131,8 @@ function OriginStory() {
           >
             Ohana was founded by Bram in Copenhagen, after years of frustration
             watching every travel tool optimise for advertisers over the people
-            actually taking the trips. The question was never "how do we rank
-            these hotels?" It was: why does none of this feel personal?
+            actually taking the trips. The question was never &ldquo;how do we rank
+            these hotels?&rdquo; It was: why does none of this feel personal?
           </p>
           <p
             className="text-[16px] leading-[1.9]"
@@ -383,7 +383,7 @@ function TeamNote() {
           fontFamily: "var(--font-sans)",
         }}
       >
-        We're a small team spread across Copenhagen, Lisbon, and Tokyo. We're
+        We&apos;re a small team spread across Copenhagen, Lisbon, and Tokyo. We&apos;re
         engineers, writers, and compulsive travellers. We think the best products
         are made by people who actually use them.
       </motion.p>

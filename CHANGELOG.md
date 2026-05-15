@@ -1,5 +1,19 @@
 # Changelog
 
+## [v0.4.0] — 2026-05-15
+
+### Features
+
+- **Feedback widget** — floating `FeedbackWidget` in the root layout; captures a screenshot (`html-to-image`) and the current page URL, posts to `/api/feedback`, which files a Linear issue in the Ohana project and auto-creates a `web` label
+
+### Fixes
+
+- Removed `app/page.tsx` so `/` resolves through the `(marketing)` route group layout
+- Escaped unbalanced quotes/apostrophes in `Companions`, `about`, `ambassadors`, and `not-found` (10 `react/no-unescaped-entities` lint errors); now renders proper curly quotes
+- Removed unused `useEffect`/`useState` imports and the dead `primary` prop from `Hero`
+- OG image: `width: "fit-content"` is invalid in Satori — swapped to `alignSelf: "flex-start"`
+- Set `metadataBase` to `https://ohana.travel` so OG/Twitter image URLs resolve absolutely instead of falling back to `localhost:3000`
+
 ## [v0.3.0] — 2026-05-14
 
 ### Features

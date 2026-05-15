@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useRef } from "react"
 import Image from "next/image"
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react"
 
@@ -122,7 +122,7 @@ export function Hero() {
           transition={{ delay: 1.3, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           className="mb-8 flex items-center gap-4"
         >
-          <MagneticButton href="#signup" primary>
+          <MagneticButton href="#signup">
             Plan with Ohana
           </MagneticButton>
           <button className="flex items-center gap-2.5 text-[14px] text-white/65 transition-colors hover:text-white">
@@ -165,11 +165,9 @@ export function Hero() {
 function MagneticButton({
   children,
   href,
-  primary,
 }: {
   children: React.ReactNode
   href?: string
-  primary?: boolean
 }) {
   const ref = useRef<HTMLAnchorElement>(null)
   const x = useMotionValue(0)
