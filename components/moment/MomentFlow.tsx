@@ -18,12 +18,12 @@ const STAGES = {
 // Client host for the Moment flow: drives the session machine and renders
 // the stage component matching the current stage.
 export function MomentFlow() {
-  const { state, loading } = useMomentSession()
+  const { state, commit, advanceStage, loading } = useMomentSession()
 
   if (loading || !state) {
     return <div className="flex min-h-dvh items-center justify-center text-muted">Loading…</div>
   }
 
   const Stage = STAGES[state.currentStage]
-  return <Stage />
+  return <Stage signal={state.signal} commit={commit} advanceStage={advanceStage} />
 }

@@ -20,6 +20,19 @@ export interface MomentState {
   completedAt: string | null
 }
 
+// A patch sent to the session: any signal field plus stage/completion.
+export type CommitPatch = Partial<ManaSignal> & {
+  currentStage?: number
+  completedAt?: string
+}
+
+// Props every stage scene receives from MomentFlow.
+export interface StageProps {
+  signal: ManaSignal
+  commit: (patch: CommitPatch) => void | Promise<void>
+  advanceStage: () => void | Promise<void>
+}
+
 export const EMPTY_SIGNAL: ManaSignal = {
   visitedCountries: [],
   moods: [],

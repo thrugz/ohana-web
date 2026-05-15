@@ -2,13 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { advance } from "@/lib/moment/momentMachine"
-import type { ManaSignal, MomentState } from "@/lib/moment/types"
+import type { CommitPatch, MomentState } from "@/lib/moment/types"
 
-// A patch can update any signal field plus the stage/completion columns.
-export type CommitPatch = Partial<ManaSignal> & {
-  currentStage?: number
-  completedAt?: string
-}
+export type { CommitPatch }
 
 interface UseMomentSession {
   state: MomentState | null
