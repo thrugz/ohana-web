@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Fraunces, Inter } from "next/font/google"
 import "./globals.css"
 import { CustomCursor } from "@/components/CustomCursor"
+import { FeedbackWidget } from "@/components/FeedbackWidget"
 import { ScrollReveal } from "@/components/ScrollReveal"
 
 const inter = Inter({
@@ -38,6 +39,7 @@ export default function RootLayout({
       <body>
         <CustomCursor />
         <ScrollReveal />
+        <FeedbackWidget />
         {children}
       </body>
     </html>
