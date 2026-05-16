@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { motion } from "motion/react"
 import { HokuMessage } from "../HokuMessage"
+import { SaveManaPrompt } from "../SaveManaPrompt"
 import { explorerBadge } from "@/lib/moment/explorerBadge"
 import type { StageProps } from "@/lib/moment/types"
 
@@ -18,6 +19,7 @@ export function Stage4Atlas({ signal, commit, advanceStage }: StageProps) {
   // Computed synchronously — instant, always real.
   const badge = explorerBadge(signal.visitedCountries.length)
   const [portrait, setPortrait] = useState<string | null>(null)
+  const [promptDismissed, setPromptDismissed] = useState(false)
   const requested = useRef(false)
 
   useEffect(() => {
@@ -96,6 +98,14 @@ export function Stage4Atlas({ signal, commit, advanceStage }: StageProps) {
           )}
         </div>
       </motion.div>
+
+      {/* Soft signup prompt at the emotional peak, before the Continue. */}
+      {portrait !== null && !promptDismissed && (
+        <SaveManaPrompt
+          onSkip={() => setPromptDismissed(true)}
+          onSave={() => setPromptDismissed(true)}
+        />
+      )}
 
       <div className="mt-auto flex justify-end pt-4">
         <button
