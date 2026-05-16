@@ -1,5 +1,25 @@
 # Changelog
 
+## [v0.5.0] — 2026-05-16
+
+### Features
+
+- **Moment Site** (`/moment`) — the 5-stage Hoku-led traveller onboarding flow, producing the anonymous Mana (Digital Twin). Built across 7 phases:
+  - **Foundation** — client-side state machine, anonymous-session API (`anonymous_session` table, httpOnly cookie token, Better-Auth link-on-signup), Hoku client, chat-thread shell
+  - **Stage 1 "Your World"** — MapLibre GL JS globe; tap visited countries
+  - **Stage 2 "Mood Match"** — image selection (the founder's "Act 0" set — pick the scene that resonates), each image mapping to canonical mood slugs, plus one free-text beat Hoku reflects on
+  - **Stage 3 "Feel Something"** — cluster cards across the 8 canonical Mood Clusters, mood-matched from `poi_final`
+  - **Stage 4 "Moods Atlas"** — computed Explorer Badge tier + Hoku-generated mood portrait
+  - **Stage 5 "Moments"** — bridge to Discovery
+  - **Signup** — soft, skippable "Save your Mana" prompt after the Stage 4 reveal
+- **Vitest** test runner added (`npm test`) — 25 tests across the Moment Site
+- **MapLibre GL JS** — open-source globe for Stage 1 (no Mapbox account; OSM vector tiles)
+
+### Notes
+
+- Hoku LLM calls degrade gracefully — a failed/empty reply falls back to a pre-authored line; the flow never blocks
+- Deferred (intended): the "Save it" signup button is a stub pending Better-Auth setup; the Stage 5 Discovery CTA links to `/discover` (Sprint 5)
+
 ## [v0.4.0] — 2026-05-15
 
 ### Features
