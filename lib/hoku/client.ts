@@ -4,7 +4,7 @@
 
 const HAYSTACK_URL = process.env.HAYSTACK_URL ?? "http://localhost:1416"
 
-export type HokuMode = "reflect" | "wanderer"
+export type HokuMode = "reflect" | "portrait"
 
 export async function askHoku(mode: HokuMode, payload: Record<string, unknown>): Promise<string> {
   try {

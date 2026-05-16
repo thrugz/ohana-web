@@ -3,7 +3,7 @@
 import { NextResponse } from "next/server"
 import { askHoku, type HokuMode } from "@/lib/hoku/client"
 
-const MODES = new Set<HokuMode>(["reflect", "wanderer"])
+const MODES = new Set<HokuMode>(["reflect", "portrait"])
 
 export async function POST(req: Request) {
   let body: { mode?: unknown; payload?: unknown }

@@ -9,7 +9,7 @@ export interface ManaSignal {
 }
 
 export interface ManaSummary {
-  wandererName: string         // e.g. "The Slow Unfolder"
+  explorerBadge: string        // Explorer Badge tier, e.g. "Wanderer"
   portrait: string             // Hoku-generated paragraph
 }
 

@@ -13,5 +13,5 @@ test("canAdvance requires stage-1 countries", () => {
   expect(canAdvance(1, { ...EMPTY_SIGNAL, visitedCountries: ["PT"] })).toBe(true)
 })
 test("isComplete only when stage 5 done", () => {
-  expect(isComplete(5, { ...EMPTY_SIGNAL, manaSummary: { wandererName: "x", portrait: "y" } })).toBe(true)
+  expect(isComplete(5, { ...EMPTY_SIGNAL, manaSummary: { explorerBadge: "x", portrait: "y" } })).toBe(true)
 })
