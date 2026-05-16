@@ -43,3 +43,21 @@
 ## Coolify deployment
 - Coolify cannot clone private GitHub repos without GitHub App auth configured — make the repo public or set up the GitHub App integration.
 - `COOLIFY_TOKEN` is not available in the shell env; use MCP Coolify tools for all API calls (curl with `$COOLIFY_TOKEN` returns 401).
+- ohana-web auto-deploys from `main` (ohana-admin deploys from `staging` — different convention per repo).
+
+## Testing
+- Test runner is Vitest + React Testing Library. `npm test` (run once), `npm run test:watch`.
+- Config: `vitest.config.ts` (jsdom env, `@` alias). Setup: `vitest.setup.ts` imports `@testing-library/jest-dom/vitest`.
+- Mock external boundaries — no live LLM, DB, or WebGL calls in tests. `maplibre-gl` touches WebGL; mock it in component tests.
+
+## Moment Site (`/moment`)
+- Traveller onboarding: a 5-stage Hoku-led interview producing the Mana (the user-facing name for the Digital Twin). Code under `app/moment/`, `components/moment/`, `lib/moment/`, `app/api/moment/`.
+- The flow is a client-side state machine (`lib/moment/momentMachine.ts`) — deterministic, instant, no LLM in the stage loop.
+- The `hoku_agent` LLM is called at exactly two moments: Stage 2 free-text reflection (`mode: "reflect"`) and Stage 4 mood portrait (`mode: "portrait"`). A failed/empty Hoku reply must fall back to a pre-authored line — the flow never blocks on the LLM.
+- Anonymous data accumulates in the PostgreSQL `anonymous_session` table (ohana-infra migration 043), keyed by an httpOnly cookie token. Better-Auth links it to a real account on signup.
+- Brand vocabulary: engineering says *Twin*, the UI/Hoku say **Mana**. The Stage 4 reveal is the **Moods Atlas**. **Explorer Badge** is a deterministic tier from countries-visited count (The Curious / Explorer / Adventurer / Wanderer / Nomad / Legend) — "Wanderer" is a tier, never a generated name.
+
+## MapLibre GL JS
+- Used for the Stage 1 globe (`components/moment/GlobePicker.tsx`). Open-source — no Mapbox account, OSM vector tiles, globe projection.
+- Like Leaflet, it accesses `window` at import time — load via `dynamic(..., { ssr: false })` or import inside `useEffect`, never at module top level.
+- If MapLibre fails to load, `GlobePicker` degrades to a searchable country `<select>` driving the same `onChange`.

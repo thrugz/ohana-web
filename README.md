@@ -1,6 +1,6 @@
 # ohana-web
 
-Marketing site for [Ohana](https://ohana.travel) — a travel companion that knows who you are.
+Marketing site and traveller onboarding for [Ohana](https://ohana.travel) — a travel companion that knows who you are.
 
 Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/react). Warm Scandinavian editorial aesthetic: OKLCH colour tokens, Fraunces variable font, spring physics throughout.
 
@@ -12,9 +12,10 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 | Styles | Tailwind CSS v4 — CSS-first `@theme` config, no tailwind.config.js |
 | Components | shadcn/ui (uses `@base-ui/react`, not Radix) |
 | Animation | Motion (`motion/react`) + native CSS `animation-timeline: view()` |
-| Map | Leaflet + react-leaflet, CartoDB Positron tiles, `ssr: false` dynamic import |
+| Map | Leaflet (marketing) + MapLibre GL JS globe (Moment Site); CartoDB Positron tiles; `ssr: false` dynamic import |
 | Fonts | Fraunces (variable, axes: opsz/SOFT/WONK) + Inter via `next/font/google` |
 | Colour | OKLCH perceptual scale — canvas, clay (#C56A3F), sage, ink |
+| Testing | Vitest + React Testing Library (`npm test`) |
 
 ## Pages
 
@@ -24,7 +25,10 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 | `/about` | `app/(marketing)/about/page.tsx` | Mission, origin story, values, giving-back, team |
 | `/pricing` | `app/(marketing)/pricing/page.tsx` | Free/Premium cards, comparison table, billing toggle, FAQ |
 | `/ambassadors` | `app/(marketing)/ambassadors/page.tsx` | Ambassador programme hero, perks, apply form |
+| `/moment` | `app/moment/page.tsx` | Traveller onboarding — 5-stage Hoku-led interview producing the Mana (Digital Twin) |
 | `*` | `app/not-found.tsx` | 404 — "This page doesn't exist. Yet." |
+
+The Moment flow is backed by four API routes under `app/api/moment/` — `session` (anonymous session), `commit` (per-stage signal), `hoku` (LLM proxy), `clusters` (mood-matched destinations).
 
 ## Key conventions
 
