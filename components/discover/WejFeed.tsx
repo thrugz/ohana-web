@@ -29,9 +29,11 @@ export function WejFeed({ wej, savedPoiIds, onToggleSave }: WejFeedProps) {
         {introLine(wej)}
       </p>
 
-      {wej.thin && (
+      {wej.cards.length < 14 && (
         <p className="text-muted text-sm">
-          A smaller set this time — still worth a look.
+          {wej.thin
+            ? "A small, hand-picked set this time — still worth a look."
+            : "A small, hand-picked set — only the places that genuinely fit."}
         </p>
       )}
 

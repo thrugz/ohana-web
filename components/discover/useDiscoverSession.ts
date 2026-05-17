@@ -8,9 +8,15 @@ interface UseDiscoverSession {
   state: DiscoverState | null
   loading: boolean
   error: boolean
+  // False when the session arrived with no Mana (no moods, no clusters) — the
+  // dominant mood was a silent default. DiscoverFlow uses this to ask the
+  // traveller via ColdStartMoodPick instead of running with the default.
+  hasMana: boolean
   retry: () => void
   loadWej: (theme: string) => Promise<void>
   toggleSave: (poiId: string, saved: boolean) => Promise<void>
+  // Seeds the dominant mood directly (used by the cold-start mood pick).
+  seedMood: (mood: string) => void
 }
 
 // Shape of GET /api/moment/session, plus saved_pois for reload-persistence.
@@ -42,6 +48,8 @@ export function useDiscoverSession(): UseDiscoverSession {
   const [state, setState] = useState<DiscoverState | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  // Whether the mounted session carried any Mana to derive a mood from.
+  const [hasMana, setHasMana] = useState(false)
   // Bumped by retry() to re-trigger the mount fetch effect.
   const [attempt, setAttempt] = useState(0)
 
@@ -58,10 +66,10 @@ export function useDiscoverSession(): UseDiscoverSession {
         if (!res.ok) throw new Error(`session fetch failed: ${res.status}`)
         const data: SessionResponse = await res.json()
         if (cancelled) return
-        const mood = dominantMood(
-          data.signal?.moods ?? [],
-          data.signal?.resonatedClusters ?? [],
-        )
+        const moods = data.signal?.moods ?? []
+        const clusters = data.signal?.resonatedClusters ?? []
+        const mood = dominantMood(moods, clusters)
+        setHasMana(moods.length > 0 || clusters.length > 0)
         setState({
           sessionId: data.sessionId,
           mood,
@@ -136,5 +144,12 @@ export function useDiscoverSession(): UseDiscoverSession {
     [state],
   )
 
-  return { state, loading, error, retry, loadWej, toggleSave }
+  // Seed the dominant mood from a cold-start pick. Marks the session as
+  // having Mana so DiscoverFlow proceeds past the mood-pick branch.
+  const seedMood = useCallback((mood: string) => {
+    setState((prev) => (prev ? { ...prev, mood } : prev))
+    setHasMana(true)
+  }, [])
+
+  return { state, loading, error, hasMana, retry, loadWej, toggleSave, seedMood }
 }

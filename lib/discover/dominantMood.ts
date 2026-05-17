@@ -1,5 +1,5 @@
 // Cluster -> representative lead mood (the 8 KGE Mood Clusters).
-const CLUSTER_LEAD: Record<string, string> = {
+export const CLUSTER_LEAD: Record<string, string> = {
   "Calm & Reflective": "calm",
   "Energetic & Social": "energetic",
   "Intense & Dramatic": "dramatic",

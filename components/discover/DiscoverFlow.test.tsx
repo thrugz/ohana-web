@@ -5,7 +5,8 @@ import { DiscoverFlow } from "./DiscoverFlow"
 vi.mock("./useDiscoverSession", () => ({
   useDiscoverSession: () => ({
     state: { sessionId: "s1", mood: "serene", currentWej: null, seenThemes: [], savedPoiIds: [] },
-    loading: false, loadWej: vi.fn(), toggleSave: vi.fn(),
+    loading: false, error: false, hasMana: true,
+    retry: vi.fn(), loadWej: vi.fn(), toggleSave: vi.fn(), seedMood: vi.fn(),
   }),
 }))
 

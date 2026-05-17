@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { HokuMessage } from "@/components/moment/HokuMessage"
 import { HokuThread } from "@/components/moment/HokuThread"
+import { ColdStartMoodPick } from "./ColdStartMoodPick"
 import { SavedTray } from "./SavedTray"
 import { ThemeSteer } from "./ThemeSteer"
 import { useDiscoverSession } from "./useDiscoverSession"
@@ -18,7 +19,8 @@ interface ThemeOption {
 // Hoku presents one Wej, the traveller scrolls + saves, then Hoku steers to
 // the next theme and the loop repeats. The SavedTray is always mounted.
 export function DiscoverFlow() {
-  const { state, loading, error, retry, loadWej, toggleSave } = useDiscoverSession()
+  const { state, loading, error, hasMana, retry, loadWej, toggleSave, seedMood } =
+    useDiscoverSession()
   const [themes, setThemes] = useState<ThemeOption[]>([])
   const [themesError, setThemesError] = useState(false)
   // Bumped to re-trigger the themes fetch after a failure.
@@ -134,6 +136,23 @@ export function DiscoverFlow() {
         className="flex min-h-dvh items-center justify-center text-muted"
       >
         Loading…
+      </div>
+    )
+  }
+
+  // Cold landing: the traveller reached /discover with no Mana, so no mood
+  // could be derived. Ask rather than running with the silent default.
+  if (!hasMana) {
+    return (
+      <div data-testid="discover-flow" className="pb-24">
+        <HokuThread>
+          <HokuMessage from="hoku">
+            Let&apos;s find places that match how you want to feel.
+          </HokuMessage>
+          <ColdStartMoodPick onPick={seedMood} />
+        </HokuThread>
+
+        <SavedTray cards={savedCards} />
       </div>
     )
   }
