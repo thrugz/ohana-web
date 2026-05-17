@@ -14,6 +14,7 @@ export interface Wej {
   theme: string
   title: string           // e.g. "Slow Food"
   cards: WejCard[]        // up to 14
+  thin?: boolean          // true when the depth guard tripped (<6 cards)
 }
 
 export interface DiscoverState {

@@ -8,7 +8,25 @@ import { useDiscoverSession } from "./useDiscoverSession"
 // and drives the discover session hook. The Wej feed, cards, theme steering,
 // and saved tray land in later phases — this is the shell that hosts them.
 export function DiscoverFlow() {
-  const { state, loading } = useDiscoverSession()
+  const { state, loading, error, retry } = useDiscoverSession()
+
+  if (error) {
+    return (
+      <div
+        data-testid="discover-flow"
+        className="flex min-h-dvh flex-col items-center justify-center gap-4 text-muted"
+      >
+        <p>We couldn&apos;t start your discovery session.</p>
+        <button
+          type="button"
+          onClick={retry}
+          className="bg-clay text-primary-foreground rounded-full px-5 py-2 text-sm"
+        >
+          Try again
+        </button>
+      </div>
+    )
+  }
 
   if (loading || !state) {
     return (

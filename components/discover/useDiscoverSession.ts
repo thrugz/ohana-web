@@ -7,6 +7,8 @@ import type { DiscoverState, Wej } from "@/lib/discover/types"
 interface UseDiscoverSession {
   state: DiscoverState | null
   loading: boolean
+  error: boolean
+  retry: () => void
   loadWej: (theme: string) => Promise<void>
   toggleSave: (poiId: string, saved: boolean) => Promise<void>
 }
@@ -21,17 +23,40 @@ interface SessionResponse {
   savedPoiIds?: string[]
 }
 
+/**
+ * Pure save/unsave list merge. When `saved` is true, append `poiId` deduped;
+ * when false, remove it. Never mutates input. Mirrors `applySave` in the save
+ * route so the optimistic update matches what the server will persist.
+ */
+export function applySaveToList(current: string[], poiId: string, saved: boolean): string[] {
+  if (saved) {
+    if (current.includes(poiId)) return [...current]
+    return [...current, poiId]
+  }
+  return current.filter((id) => id !== poiId)
+}
+
 // Loads the anonymous session on mount, derives the dominant mood from the
 // Mana, and drives Wej loading + POI saving for the Discover flow.
 export function useDiscoverSession(): UseDiscoverSession {
   const [state, setState] = useState<DiscoverState | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  // Bumped by retry() to re-trigger the mount fetch effect.
+  const [attempt, setAttempt] = useState(0)
+
+  const retry = useCallback(() => {
+    setAttempt((n) => n + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setError(false)
     fetch("/api/moment/session")
-      .then((res) => res.json())
-      .then((data: SessionResponse) => {
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`session fetch failed: ${res.status}`)
+        const data: SessionResponse = await res.json()
         if (cancelled) return
         const mood = dominantMood(
           data.signal?.moods ?? [],
@@ -45,14 +70,16 @@ export function useDiscoverSession(): UseDiscoverSession {
           savedPoiIds: data.savedPoiIds ?? [],
         })
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setError(true)
+      })
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [attempt])
 
   const loadWej = useCallback(
     async (theme: string) => {
@@ -61,6 +88,8 @@ export function useDiscoverSession(): UseDiscoverSession {
       try {
         const res = await fetch(`/api/discover/wej?${params}`)
         if (!res.ok) return
+        // The wej route may return { thin: true } when the depth guard trips;
+        // preserve it so Phase 3/4 components can branch on a thin feed.
         const wej: Wej = await res.json()
         setState((prev) =>
           prev
@@ -85,15 +114,11 @@ export function useDiscoverSession(): UseDiscoverSession {
       if (!state) return
       const sessionId = state.sessionId
       // Optimistic: reflect the save immediately.
-      setState((prev) => {
-        if (!prev) return prev
-        const next = saved
-          ? prev.savedPoiIds.includes(poiId)
-            ? prev.savedPoiIds
-            : [...prev.savedPoiIds, poiId]
-          : prev.savedPoiIds.filter((id) => id !== poiId)
-        return { ...prev, savedPoiIds: next }
-      })
+      setState((prev) =>
+        prev
+          ? { ...prev, savedPoiIds: applySaveToList(prev.savedPoiIds, poiId, saved) }
+          : prev,
+      )
       try {
         const res = await fetch("/api/discover/save", {
           method: "POST",
@@ -111,5 +136,5 @@ export function useDiscoverSession(): UseDiscoverSession {
     [state],
   )
 
-  return { state, loading, loadWej, toggleSave }
+  return { state, loading, error, retry, loadWej, toggleSave }
 }
