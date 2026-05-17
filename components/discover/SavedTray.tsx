@@ -16,7 +16,7 @@ export function SavedTray({ cards }: SavedTrayProps) {
       className="border-line bg-surface fixed bottom-4 left-1/2 z-20 w-[min(36rem,calc(100%-2rem))] -translate-x-1/2 rounded-2xl border shadow-lg"
     >
       <summary className="text-ink flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm">
-        <span className="text-clay">
+        <span className="text-clay" aria-live="polite">
           <span aria-hidden="true">♥</span> {cards.length} saved
         </span>
         <span className="text-muted text-xs">tap to view</span>

@@ -22,7 +22,11 @@ export function ThemeSteer({ themes, onPick }: ThemeSteerProps) {
     const trimmed = text.trim()
     if (!trimmed) return
     setText("")
-    onPick(trimmed)
+    // Free text is a best-effort exact-slug match: the wej engine matches
+    // strictly via `themes @> $2` array containment, so we slugify to the
+    // canonical shape. A non-matching entry yields an empty/thin Wej, which
+    // the thin-data framing surfaces honestly — no fuzzy matching here.
+    onPick(trimmed.toLowerCase().replace(/\s+/g, "-"))
   }
 
   return (

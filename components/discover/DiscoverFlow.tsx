@@ -20,29 +20,45 @@ interface ThemeOption {
 export function DiscoverFlow() {
   const { state, loading, error, retry, loadWej, toggleSave } = useDiscoverSession()
   const [themes, setThemes] = useState<ThemeOption[]>([])
+  const [themesError, setThemesError] = useState(false)
+  // Bumped to re-trigger the themes fetch after a failure.
+  const [themesAttempt, setThemesAttempt] = useState(0)
 
   const sessionId = state?.sessionId
   const seenKey = state?.seenThemes.join(",") ?? ""
 
+  const retryThemes = useCallback(() => {
+    setThemesAttempt((n) => n + 1)
+  }, [])
+
   // Fetch the offerable themes whenever the session or the seen-set changes.
-  // The route returns a bare ThemeOption[] array.
+  // The route returns a bare ThemeOption[] array. A failed fetch sets
+  // `themesError` so the steer area can surface a retry, distinct from a
+  // genuine empty offerable set.
   useEffect(() => {
     if (!sessionId) return
     let cancelled = false
+    setThemesError(false)
     const params = new URLSearchParams({ session: sessionId })
     if (seenKey) params.set("seen", seenKey)
     fetch(`/api/discover/themes?${params}`)
-      .then((res) => (res.ok ? res.json() : []))
+      .then((res) => {
+        if (!res.ok) throw new Error(`themes fetch failed: ${res.status}`)
+        return res.json()
+      })
       .then((data: ThemeOption[]) => {
         if (!cancelled) setThemes(Array.isArray(data) ? data : [])
       })
       .catch(() => {
-        if (!cancelled) setThemes([])
+        if (!cancelled) {
+          setThemes([])
+          setThemesError(true)
+        }
       })
     return () => {
       cancelled = true
     }
-  }, [sessionId, seenKey])
+  }, [sessionId, seenKey, themesAttempt])
 
   // Accumulate every card Hoku has shown, so the SavedTray can resolve saved
   // POI ids back to full cards even after the Wej moves on.
@@ -70,6 +86,27 @@ export function DiscoverFlow() {
       void loadWej(theme)
     },
     [loadWej],
+  )
+
+  // The steer area: chips + free-text input, plus an inline retry when the
+  // themes fetch failed (so a collapsed chip row is never mistaken for a
+  // genuine empty offerable set).
+  const steerArea = (
+    <>
+      <ThemeSteer themes={themes} onPick={handlePick} />
+      {themesError && (
+        <p className="text-muted flex items-center gap-2 text-sm">
+          <span>We couldn&apos;t load theme suggestions.</span>
+          <button
+            type="button"
+            onClick={retryThemes}
+            className="border-clay text-clay rounded-full border px-3 py-1 text-xs"
+          >
+            Retry
+          </button>
+        </p>
+      )}
+    </>
   )
 
   if (error) {
@@ -118,14 +155,14 @@ export function DiscoverFlow() {
             <HokuMessage from="hoku">
               Where shall we wander next?
             </HokuMessage>
-            <ThemeSteer themes={themes} onPick={handlePick} />
+            {steerArea}
           </>
         ) : (
           <>
             <HokuMessage from="hoku">
               What kind of places are you in the mood for?
             </HokuMessage>
-            <ThemeSteer themes={themes} onPick={handlePick} />
+            {steerArea}
           </>
         )}
       </HokuThread>
