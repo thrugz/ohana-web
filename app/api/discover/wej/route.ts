@@ -5,14 +5,15 @@
 // the caller (Hoku) never offers a theme whose result set is near-empty. This
 // structurally absorbs a thin demo poi_final.
 import { NextResponse } from "next/server"
-import { getPool } from "@/lib/moment/db"
+import { titleCaseSlug } from "@/lib/discover/slug"
 import type { WejCard } from "@/lib/discover/types"
+import { getPool } from "@/lib/moment/db"
 
 const DEPTH_MIN = 6
 const WEJ_CAP = 14
 
 // A poi_final row, as far as the Wej query selects it.
-interface PoiFinalRow {
+export interface PoiFinalRow {
   id: string
   name: string
   short_description: string | null
@@ -47,7 +48,7 @@ export function buildWejQuery(mood: string, theme: string): { text: string; valu
 // poi_final.photos is JSONB defaulting to '[]'. The element shape is not
 // pinned by a migration; handle a bare URL string or an object with a url/src
 // key, and fall back to null. See route concern note in the task report.
-function firstPhotoUrl(photos: unknown): string | null {
+export function firstPhotoUrl(photos: unknown): string | null {
   if (!Array.isArray(photos) || photos.length === 0) return null
   const first = photos[0]
   if (typeof first === "string") return first
@@ -59,7 +60,7 @@ function firstPhotoUrl(photos: unknown): string | null {
   return null
 }
 
-function rowToCard(row: PoiFinalRow, mood: string, theme: string): WejCard {
+export function rowToCard(row: PoiFinalRow, mood: string, theme: string): WejCard {
   return {
     poiId: row.id,
     name: row.name,
@@ -72,13 +73,9 @@ function rowToCard(row: PoiFinalRow, mood: string, theme: string): WejCard {
   }
 }
 
-// Title-case a theme slug, e.g. "slow_food" / "slow-food" -> "Slow Food".
-export function themeTitle(theme: string): string {
-  return theme
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ")
+// Depth guard decision: a Wej with fewer than DEPTH_MIN cards is "thin".
+export function isThinWej(cardCount: number): boolean {
+  return cardCount < DEPTH_MIN
 }
 
 export async function GET(req: Request) {
@@ -101,10 +98,10 @@ export async function GET(req: Request) {
     cards = []
   }
 
-  const title = themeTitle(theme)
+  const title = titleCaseSlug(theme)
 
   // Depth guard: too few cards to make a worthwhile Wej.
-  if (cards.length < DEPTH_MIN) {
+  if (isThinWej(cards.length)) {
     return NextResponse.json({ mood, theme, title, thin: true, cards })
   }
 

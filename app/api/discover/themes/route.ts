@@ -7,9 +7,10 @@
 // traveller toward a theme that would surface a near-empty feed.
 import { NextResponse } from "next/server"
 import { dominantMood } from "@/lib/discover/dominantMood"
+import { titleCaseSlug } from "@/lib/discover/slug"
 import { getPool, isUuid } from "@/lib/moment/db"
-import { buildWejQuery } from "../wej/route"
 
+// A Wej needs at least this many cards to be worth offering (the depth guard).
 const DEPTH_MIN = 6
 
 interface ThemeOption {
@@ -19,7 +20,7 @@ interface ThemeOption {
 
 // Parse ?seen= — supports repeated params (?seen=a&seen=b) and a single
 // comma-separated value (?seen=a,b).
-function parseSeen(params: URLSearchParams): Set<string> {
+export function parseSeen(params: URLSearchParams): Set<string> {
   const seen = new Set<string>()
   for (const raw of params.getAll("seen")) {
     for (const slug of raw.split(",")) {
@@ -52,31 +53,28 @@ async function candidateThemes(): Promise<ThemeOption[]> {
     )
     return live.rows
       .filter((r) => r.theme)
-      .map((r) => ({ slug: r.theme, label: themeLabel(r.theme) }))
+      .map((r) => ({ slug: r.theme, label: titleCaseSlug(r.theme) }))
   } catch {
     return []
   }
 }
 
-function themeLabel(slug: string): string {
-  return slug
-    .split(/[-_\s]+/)
-    .filter(Boolean)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ")
-}
-
-// Count matching POIs for a Wej, capped — enough to clear the depth guard.
-async function wejDepth(mood: string, theme: string): Promise<number> {
-  const { text, values } = buildWejQuery(mood, theme)
+// One grouped query: for the given mood, the set of theme slugs whose Wej
+// clears the depth guard. Replaces an N+1 per-theme count loop.
+async function deepThemes(mood: string): Promise<Set<string>> {
   try {
-    const counted = await getPool().query<{ n: string }>(
-      `SELECT count(*)::int AS n FROM (${text}) sub`,
-      values,
+    const result = await getPool().query<{ theme: string }>(
+      `SELECT unnest(themes) AS theme
+         FROM poi_final
+        WHERE moods @> $1
+          AND operational_status = 'active'
+        GROUP BY 1
+       HAVING count(*) >= $2`,
+      [[mood], DEPTH_MIN],
     )
-    return Number(counted.rows[0]?.n ?? 0)
+    return new Set(result.rows.map((r) => r.theme))
   } catch {
-    return 0
+    return new Set()
   }
 }
 
@@ -105,16 +103,10 @@ export async function GET(req: Request) {
   const mood = dominantMood(moods, clusters)
   const seen = parseSeen(params)
 
-  const candidates = await candidateThemes()
-  const fresh = candidates.filter((t) => !seen.has(t.slug))
+  // Two queries total: the candidate registry and the grouped depth check.
+  const [candidates, deep] = await Promise.all([candidateThemes(), deepThemes(mood)])
 
-  // Run the depth check for each fresh candidate; keep only those that clear it.
-  const checked = await Promise.all(
-    fresh.map(async (t) => ({ option: t, depth: await wejDepth(mood, t.slug) })),
-  )
-  const offerable = checked
-    .filter(({ depth }) => depth >= DEPTH_MIN)
-    .map(({ option }) => option)
+  const offerable = candidates.filter((t) => deep.has(t.slug) && !seen.has(t.slug))
 
   return NextResponse.json(offerable)
 }
