@@ -1,7 +1,7 @@
 "use client"
 
 import { WejCard } from "./WejCard"
-import type { Wej } from "@/lib/discover/types"
+import { WEJ_CARD_TARGET, type Wej } from "@/lib/discover/types"
 
 interface WejFeedProps {
   wej: Wej
@@ -29,7 +29,7 @@ export function WejFeed({ wej, savedPoiIds, onToggleSave }: WejFeedProps) {
         {introLine(wej)}
       </p>
 
-      {wej.cards.length < 14 && (
+      {wej.cards.length < WEJ_CARD_TARGET && (
         <p className="text-muted text-sm">
           {wej.thin
             ? "A small, hand-picked set this time — still worth a look."

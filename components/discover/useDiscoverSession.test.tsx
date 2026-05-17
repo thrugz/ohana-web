@@ -100,6 +100,44 @@ describe("useDiscoverSession toggleSave", () => {
   })
 })
 
+describe("useDiscoverSession hasMana / seedMood", () => {
+  test("hasMana is false when the signal has no moods and no clusters", async () => {
+    mockFetch(() => ({
+      ...SESSION_RESPONSE,
+      signal: { moods: [], resonatedClusters: [] },
+    }))
+
+    const { result } = renderHook(() => useDiscoverSession())
+    await waitFor(() => expect(result.current.state).not.toBeNull())
+    expect(result.current.hasMana).toBe(false)
+  })
+
+  test("hasMana is true for a populated signal", async () => {
+    mockFetch(() => SESSION_RESPONSE)
+
+    const { result } = renderHook(() => useDiscoverSession())
+    await waitFor(() => expect(result.current.state).not.toBeNull())
+    expect(result.current.hasMana).toBe(true)
+  })
+
+  test("seedMood sets the mood and flips hasMana to true", async () => {
+    mockFetch(() => ({
+      ...SESSION_RESPONSE,
+      signal: { moods: [], resonatedClusters: [] },
+    }))
+
+    const { result } = renderHook(() => useDiscoverSession())
+    await waitFor(() => expect(result.current.state).not.toBeNull())
+    expect(result.current.hasMana).toBe(false)
+
+    act(() => {
+      result.current.seedMood("calm")
+    })
+    expect(result.current.state?.mood).toBe("calm")
+    expect(result.current.hasMana).toBe(true)
+  })
+})
+
 describe("useDiscoverSession mount error", () => {
   test("surfaces error on a non-OK session fetch", async () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 }) as unknown as typeof fetch

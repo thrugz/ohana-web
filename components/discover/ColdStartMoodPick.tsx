@@ -19,7 +19,7 @@ export function ColdStartMoodPick({ onPick }: ColdStartMoodPickProps) {
         I&apos;ll find places to match.
       </HokuMessage>
 
-      <div className="flex flex-wrap gap-2">
+      <div role="group" aria-label="Choose a mood" className="flex flex-wrap gap-2">
         {Object.entries(CLUSTER_LEAD).map(([cluster, lead]) => (
           <button
             key={cluster}

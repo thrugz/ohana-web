@@ -1,3 +1,7 @@
+// Target card count for a full Wej. The Wej engine caps at this many cards;
+// WejFeed treats a Wej below it as thin and frames it honestly.
+export const WEJ_CARD_TARGET = 14
+
 export interface WejCard {
   poiId: string
   name: string
@@ -13,7 +17,7 @@ export interface Wej {
   mood: string
   theme: string
   title: string           // e.g. "Slow Food"
-  cards: WejCard[]        // up to 14
+  cards: WejCard[]        // up to WEJ_CARD_TARGET
   thin?: boolean          // true when the depth guard tripped (<6 cards)
 }
 
