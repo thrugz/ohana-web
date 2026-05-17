@@ -1,10 +1,15 @@
-// GET /api/discover/themes?session=<id>&seen=a&seen=b — returns the theme
-// options Hoku can offer a traveller next.
+// GET /api/discover/themes?session=<id>&seen=a&seen=b&mood=<mood> — returns
+// the theme options Hoku can offer a traveller next.
 //
 // The session's dominant mood drives every candidate Wej. A theme is only
 // returned if its Wej (dominant mood × theme) clears the >=6-card depth guard
 // and the traveller has not already seen it. This means Hoku never steers a
 // traveller toward a theme that would surface a near-empty feed.
+//
+// An optional `?mood=` query param overrides the server-side dominantMood
+// derivation. The cold-start flow seeds a picked mood in client state only
+// (no DB write), so without the override the still-empty session row would
+// derive "authentic" and the steer chips would diverge from the Wej cards.
 import { NextResponse } from "next/server"
 import { dominantMood } from "@/lib/discover/dominantMood"
 import { titleCaseSlug } from "@/lib/discover/slug"
@@ -29,6 +34,19 @@ export function parseSeen(params: URLSearchParams): Set<string> {
     }
   }
   return seen
+}
+
+// Resolve the mood that drives the depth/themes computation. An explicit,
+// non-empty `?mood=` override wins; otherwise derive from the session row.
+// `override` is the raw query param value (possibly null).
+export function resolveMood(
+  override: string | null,
+  moods: string[],
+  clusters: string[],
+): string {
+  const trimmed = override?.trim()
+  if (trimmed) return trimmed
+  return dominantMood(moods, clusters)
 }
 
 // Candidate themes: prefer the canonical `themes` registry (migration 008c /
@@ -100,7 +118,7 @@ export async function GET(req: Request) {
     // DB unavailable — dominantMood falls back to a safe default below.
   }
 
-  const mood = dominantMood(moods, clusters)
+  const mood = resolveMood(params.get("mood"), moods, clusters)
   const seen = parseSeen(params)
 
   // Two queries total: the candidate registry and the grouped depth check.

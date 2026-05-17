@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { slugify } from "@/lib/discover/slug"
 
 interface ThemeOption {
   slug: string
@@ -26,7 +27,7 @@ export function ThemeSteer({ themes, onPick }: ThemeSteerProps) {
     // strictly via `themes @> $2` array containment, so we slugify to the
     // canonical shape. A non-matching entry yields an empty/thin Wej, which
     // the thin-data framing surfaces honestly — no fuzzy matching here.
-    onPick(trimmed.toLowerCase().replace(/\s+/g, "-"))
+    onPick(slugify(trimmed))
   }
 
   return (

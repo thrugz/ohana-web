@@ -28,21 +28,25 @@ export function DiscoverFlow() {
 
   const sessionId = state?.sessionId
   const seenKey = state?.seenThemes.join(",") ?? ""
+  const mood = state?.mood
 
   const retryThemes = useCallback(() => {
     setThemesAttempt((n) => n + 1)
   }, [])
 
-  // Fetch the offerable themes whenever the session or the seen-set changes.
-  // The route returns a bare ThemeOption[] array. A failed fetch sets
-  // `themesError` so the steer area can surface a retry, distinct from a
-  // genuine empty offerable set.
+  // Fetch the offerable themes whenever the session, the seen-set, or the
+  // mood changes. The route returns a bare ThemeOption[] array. A failed
+  // fetch sets `themesError` so the steer area can surface a retry, distinct
+  // from a genuine empty offerable set. Passing `mood` keeps the steer chips
+  // aligned with the Wej cards after a cold-start pick (the seeded mood is
+  // client-only, so the route can't re-derive it from the session row).
   useEffect(() => {
     if (!sessionId) return
     let cancelled = false
     setThemesError(false)
     const params = new URLSearchParams({ session: sessionId })
     if (seenKey) params.set("seen", seenKey)
+    if (mood) params.set("mood", mood)
     fetch(`/api/discover/themes?${params}`)
       .then((res) => {
         if (!res.ok) throw new Error(`themes fetch failed: ${res.status}`)
@@ -60,7 +64,7 @@ export function DiscoverFlow() {
     return () => {
       cancelled = true
     }
-  }, [sessionId, seenKey, themesAttempt])
+  }, [sessionId, seenKey, mood, themesAttempt])
 
   // Accumulate every card Hoku has shown, so the SavedTray can resolve saved
   // POI ids back to full cards even after the Wej moves on.
