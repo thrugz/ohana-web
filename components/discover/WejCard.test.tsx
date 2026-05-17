@@ -11,8 +11,16 @@ test("source attribution is always visible", () => {
 })
 test("tapping the card expands it to show the description", async () => {
   render(<WejCard card={card} saved={false} onToggleSave={vi.fn()} />)
+  expect(screen.queryByText(/quiet terrace above Alfama/i)).not.toBeInTheDocument()
   await userEvent.click(screen.getByText("Café da Garagem"))
   expect(screen.getByText(/quiet terrace above Alfama/i)).toBeInTheDocument()
+})
+test("null photoUrl renders the text-forward fallback, not an image", () => {
+  const { container } = render(
+    <WejCard card={card} saved={false} onToggleSave={vi.fn()} />,
+  )
+  expect(container.querySelector("img")).toBeNull()
+  expect(screen.getByText("Lisbon")).toBeInTheDocument()
 })
 test("the save control fires onToggleSave", async () => {
   const onToggleSave = vi.fn()

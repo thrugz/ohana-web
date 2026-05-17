@@ -16,7 +16,8 @@ export function WejCard({ card, saved, onToggleSave }: WejCardProps) {
   const [expanded, setExpanded] = useState(false)
   // POI photos come from public data sources and often 404; fall back gracefully.
   const [photoBroken, setPhotoBroken] = useState(false)
-  const showPhoto = card.photoUrl !== null && !photoBroken
+  const photoUrl = card.photoUrl
+  const showPhoto = photoUrl !== null && !photoBroken
 
   function handleSave(e: React.MouseEvent) {
     // Keep the heart independent of the card-body expand toggle.
@@ -33,7 +34,7 @@ export function WejCard({ card, saved, onToggleSave }: WejCardProps) {
       {showPhoto ? (
         // eslint-disable-next-line @next/next/no-img-element -- arbitrary external POI URLs, no loader config
         <img
-          src={card.photoUrl as string}
+          src={photoUrl}
           alt={card.name}
           onError={() => setPhotoBroken(true)}
           className="h-40 w-full object-cover"
@@ -77,7 +78,7 @@ export function WejCard({ card, saved, onToggleSave }: WejCardProps) {
           <button
             type="button"
             onClick={handleSave}
-            aria-label={saved ? "unsave" : "save"}
+            aria-label="Save"
             aria-pressed={saved}
             className="text-clay -mr-1 -mt-1 shrink-0 rounded-full p-1.5 text-xl leading-none transition-transform hover:scale-110"
           >
@@ -96,7 +97,9 @@ export function WejCard({ card, saved, onToggleSave }: WejCardProps) {
             <p className="text-ink text-sm leading-relaxed">
               {card.shortDescription}
             </p>
-            {card.city && (
+            {/* Only show city here when a photo is up — the null-photo
+                fallback already surfaces the city, so this avoids a dup. */}
+            {card.city && showPhoto && (
               <p className="text-muted text-xs">{card.city}</p>
             )}
           </div>
