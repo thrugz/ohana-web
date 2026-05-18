@@ -12,6 +12,7 @@ export type CreatorRecord = {
   revenue_share_tier: string | null
   kyc_status: string
   payout_enabled: boolean
+  mollie_org_id: string | null
 }
 
 const ACTIVE_STATUSES = new Set(["onboarding", "live"])
@@ -45,7 +46,7 @@ export const getAmbassadorRecord = cache(async (): Promise<CreatorRecord | null>
   const pool = getPool()
   const result = await pool.query<CreatorRecord>(
     `SELECT id, slug, display_name, creator_type, status,
-            revenue_share_tier, kyc_status, payout_enabled
+            revenue_share_tier, kyc_status, payout_enabled, mollie_org_id
      FROM creator
      WHERE id = $1`,
     [creatorId],
