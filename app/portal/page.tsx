@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { getAmbassadorRecord, humanizeCreatorType } from "@/lib/portal/ambassador"
 
 const TIER_LABELS: Record<string, string> = {
@@ -55,7 +56,12 @@ export default async function PortalPage() {
 
       <section>
         <h2 className="text-xs uppercase tracking-widest text-muted mb-4">Earnings</h2>
-        <ComingSoon />
+        <div className="rounded-lg border border-line bg-surface p-6 flex items-center justify-between">
+          <p className="text-sm text-muted">View your earnings and payout history.</p>
+          <Link href="/portal/payments" className="text-sm text-ink underline underline-offset-2">
+            Go to Payments
+          </Link>
+        </div>
       </section>
     </div>
   )

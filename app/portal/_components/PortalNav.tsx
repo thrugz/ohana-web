@@ -7,9 +7,14 @@ export function PortalNav() {
         <Link href="/portal" className="font-serif text-lg text-ink" style={{ fontWeight: 400 }}>
           Ohana Portal
         </Link>
-        <Link href="/sign-in" className="text-sm text-muted hover:text-ink transition-colors">
-          Sign out
-        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/portal/payments" className="text-sm text-muted hover:text-ink transition-colors">
+            Payments
+          </Link>
+          <Link href="/sign-in" className="text-sm text-muted hover:text-ink transition-colors">
+            Sign out
+          </Link>
+        </div>
       </div>
     </nav>
   )
