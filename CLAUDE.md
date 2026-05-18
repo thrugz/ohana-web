@@ -16,6 +16,18 @@
 ## Git
 - `ohana-web/` is gitignored in the parent repo — it has its own git history, run `git` from inside `ohana-web/`
 
+## Linear workflow
+- After completing a feature, creating a PR, merging, or opening/closing a related issue: update the Linear issue status and link the PR. This is mandatory, not optional.
+- Use `mcp__claude_ai_Linear__save_issue` to set state to Done and attach the PR link via `links`.
+- After concluding a main feature, run `/release-prep` to update README, capture session learnings in CLAUDE.md, and generate a changelog entry before the next cycle.
+
+## Creator portal (`/portal`)
+- Auth gate: `requireAmbassador()` in `app/portal/layout.tsx` — covers all portal routes. API routes call `getPortalSession()` directly for a 401 on auth failure.
+- DB access uses raw `pg` via `getPool()` from `lib/moment/db` — no Drizzle in this repo.
+- Creator slug is the stable identifier for portal data (e.g. `creators[]` column on `raw_pois`). Always fetch it from `getAmbassadorRecord().slug`, not the creator UUID.
+- CSV import writes to `raw_pois` with `source='creator'` and `creators=[slug]`. Dedup is via `ON CONFLICT (source, source_id) DO NOTHING` where `source_id = buildSourceId(slug, name, addressOrCoords)`.
+- `PORTAL_DEV_CREATOR_ID` env var bypasses auth in dev only — never set in deployed environments.
+
 ## Design system
 - Fraunces: always `fontWeight: 400`, never 700+. Use `fontVariationSettings: '"opsz" 144'` at display sizes
 - All colour tokens are in `app/globals.css` under `@theme inline {}` — do not hardcode hex values
