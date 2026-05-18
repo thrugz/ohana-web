@@ -26,6 +26,7 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 | `/pricing` | `app/(marketing)/pricing/page.tsx` | Free/Premium cards, comparison table, billing toggle, FAQ |
 | `/ambassadors` | `app/(marketing)/ambassadors/page.tsx` | Ambassador programme hero, perks, apply form |
 | `/moment` | `app/moment/page.tsx` | Traveller onboarding — 5-stage Hoku-led interview producing the Mana (Digital Twin) |
+| `/sign-in` | `app/sign-in/page.tsx` | Authentication — sign in or create account; passkey (WebAuthn/FIDO2) + email/password fallback |
 | `*` | `app/not-found.tsx` | 404 — "This page doesn't exist. Yet." |
 
 The Moment flow is backed by four API routes under `app/api/moment/` — `session` (anonymous session), `commit` (per-stage signal), `hoku` (LLM proxy), `clusters` (mood-matched destinations).
@@ -40,6 +41,12 @@ The Moment flow is backed by four API routes under `app/api/moment/` — `sessio
 - Page transitions via `app/(marketing)/template.tsx` (re-mounts on every navigation)
 - Design tokens live in `app/globals.css` under `@theme inline {}`
 - `FeedbackWidget` (global, in root layout) — floating button captures a screenshot + page URL and files a Linear issue in the Ohana project via `/api/feedback`
+
+## Environment variables
+
+| Variable | Purpose |
+|---|---|
+| `NEXT_PUBLIC_PASSKEY_RP_ID` | WebAuthn relying-party domain. Defaults to `window.location.hostname`. Set to `ohana.place` in production before launching passkey registration — credentials are domain-bound and cannot be migrated. |
 
 ## Dev
 

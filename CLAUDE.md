@@ -57,6 +57,13 @@
 - Anonymous data accumulates in the PostgreSQL `anonymous_session` table (ohana-infra migration 043), keyed by an httpOnly cookie token. Better-Auth links it to a real account on signup.
 - Brand vocabulary: engineering says *Twin*, the UI/Hoku say **Mana**. The Stage 4 reveal is the **Moods Atlas**. **Explorer Badge** is a deterministic tier from countries-visited count (The Curious / Explorer / Adventurer / Wanderer / Nomad / Legend) — "Wanderer" is a tier, never a generated name.
 
+## WebAuthn / Passkeys (`/sign-in`)
+- RP ID is `NEXT_PUBLIC_PASSKEY_RP_ID` env var, defaulting to `window.location.hostname`. Set it to `ohana.place` before any passkey registration goes live in production — credentials are bound to the RP ID at creation and cannot be migrated across domains.
+- `authenticatorAttachment: "platform"` + `residentKey: "required"` — device-bound, discoverable credentials only (Face ID / Touch ID / Windows Hello). No roaming hardware keys.
+- The backend verification stubs live in `passkeyRegister` and `passkeyAuthenticate` in `app/sign-in/page.tsx` — marked with `TODO` comments. Wire them to Better Auth when the auth backend is ready.
+- Sign-in tab calls `credentials.get()` with no `allowCredentials` — the browser shows its native account picker. No email field needed on that path.
+- `NotAllowedError` from `credentials.create/get` = user cancelled; treat as idle, not an error.
+
 ## MapLibre GL JS
 - Used for the Stage 1 globe (`components/moment/GlobePicker.tsx`). Open-source — no Mapbox account, OSM vector tiles, globe projection.
 - Like Leaflet, it accesses `window` at import time — load via `dynamic(..., { ssr: false })` or import inside `useEffect`, never at module top level.

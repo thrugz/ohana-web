@@ -44,7 +44,7 @@ export function SiteNav() {
   const navBg = scrolled || mobileOpen ? "oklch(0.99 0.005 80 / 0.96)" : "transparent"
   const navBlur = scrolled || mobileOpen ? "blur(12px)" : "none"
   const navBorder = scrolled || mobileOpen ? "1px solid var(--color-line)" : "1px solid transparent"
-  const linkColor = scrolled || mobileOpen ? "var(--color-muted)" : "rgba(255,255,255,0.65)"
+  const linkColor = scrolled || mobileOpen ? "var(--color-ink)" : "rgba(255,255,255,0.88)"
   const logoColor = scrolled || mobileOpen ? "var(--color-ink)" : "white"
 
   return (
@@ -102,9 +102,9 @@ export function SiteNav() {
           {/* Desktop right */}
           <div className="ml-auto hidden items-center gap-4 md:flex">
             <Link
-              href="#"
+              href="/sign-in"
               className="text-[13px] no-underline transition-colors duration-150"
-              style={{ color: scrolled ? "var(--color-muted)" : "rgba(255,255,255,0.55)" }}
+              style={{ color: scrolled ? "var(--color-ink)" : "rgba(255,255,255,0.88)" }}
             >
               Sign in
             </Link>
@@ -185,7 +185,7 @@ export function SiteNav() {
                   </motion.div>
                 ))}
                 <div className="mt-4 flex flex-col gap-3 border-t pt-4" style={{ borderColor: "var(--color-line)" }}>
-                  <Link href="#" className="text-[14px] no-underline" style={{ color: "var(--color-muted)" }}>
+                  <Link href="/sign-in" className="text-[14px] no-underline" style={{ color: "var(--color-muted)" }}>
                     Sign in
                   </Link>
                   <a

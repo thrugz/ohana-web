@@ -1,5 +1,23 @@
 # Changelog
 
+## [v0.6.0] — 2026-05-18
+
+### Features
+
+- **Sign-in page** (`/sign-in`) — split-layout auth page matching the marketing aesthetic: Bali hero photo panel on the left, clean form on the right. Tabs for "Sign in" / "Create account" with a spring-animated underline indicator.
+- **Passkey authentication** — WebAuthn/FIDO2 via raw browser API (`navigator.credentials.create/get`). Platform authenticators only (`authenticatorAttachment: "platform"`), discoverable credentials required. Sign-in fires the native credential picker with no email needed; sign-up binds the passkey to the provided email + name. RP ID is driven by `NEXT_PUBLIC_PASSKEY_RP_ID` (defaults to `hostname`).
+- **Email/password fallback** — password form with floating-label inputs sits below the passkey button with an "or" divider.
+
+### Fixes
+
+- **Nav contrast** — link opacity over the hero increased from 55–65% white to 88% white; scrolled state upgraded from `--color-muted` to `--color-ink` for sharper legibility.
+- **Sign in link** — `href="#"` replaced with `/sign-in` (both desktop and mobile nav).
+
+### Notes
+
+- Passkey credential persistence is a stub (`localStorage` + `TODO` comment). Wire to Better Auth when the backend is ready.
+- WebAuthn credentials are domain-bound — set `NEXT_PUBLIC_PASSKEY_RP_ID=ohana.place` before any registrations go live in production to avoid a forced re-registration at cutover.
+
 ## [v0.5.0] — 2026-05-16
 
 ### Features
