@@ -26,15 +26,23 @@ export function SendEmailButton({ itineraryId }: { itineraryId: string }) {
   return (
     <button
       type="button"
-      onClick={state === "error" ? handleSend : state === "idle" ? handleSend : undefined}
+      onClick={handleSend}
       disabled={state === "sending" || state === "sent"}
-      className="text-sm underline underline-offset-2 hover:text-ink transition-colors disabled:opacity-50"
+      className="text-sm underline underline-offset-2 transition-colors disabled:opacity-50"
       style={{
         color: "var(--color-muted)",
         background: "none",
         border: "none",
         cursor: state === "idle" || state === "error" ? "pointer" : "default",
         padding: 0,
+      }}
+      onMouseEnter={(e) => {
+        if (state === "idle" || state === "error") {
+          (e.currentTarget as HTMLButtonElement).style.color = "var(--color-ink)"
+        }
+      }}
+      onMouseLeave={(e) => {
+        (e.currentTarget as HTMLButtonElement).style.color = "var(--color-muted)"
       }}
     >
       {labels[state]}

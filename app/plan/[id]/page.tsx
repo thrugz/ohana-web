@@ -38,20 +38,25 @@ export default async function ItineraryPage({
       <div className="flex flex-col gap-10">
         {itinerary.days.map((day) => (
           <section key={day.dayIndex}>
-            <h2
-              className="text-[11px] uppercase tracking-widest mb-4"
-              style={{ color: "var(--color-muted)" }}
-            >
-              Day {day.dayIndex + 1}
-              {day.items[0]?.cityName && (
-                <span
-                  className="ml-2 capitalize"
-                  style={{ textTransform: "capitalize", letterSpacing: "normal" }}
-                >
-                  — {day.items[0].cityName}
-                </span>
-              )}
-            </h2>
+            <div className="mb-4 flex items-baseline gap-2">
+              <span
+                className="text-[11px] uppercase tracking-widest"
+                style={{ color: "var(--color-muted)" }}
+              >
+                Day {day.dayIndex + 1}
+              </span>
+              {(() => {
+                const cityName = day.items.find((i) => i.cityName)?.cityName
+                return cityName ? (
+                  <span
+                    className="text-[11px] capitalize"
+                    style={{ color: "var(--color-muted)" }}
+                  >
+                    — {cityName}
+                  </span>
+                ) : null
+              })()}
+            </div>
             <div className="flex flex-col gap-3">
               {day.items.map((item) => (
                 <div
