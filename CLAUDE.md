@@ -17,9 +17,10 @@
 - `ohana-web/` is gitignored in the parent repo — it has its own git history, run `git` from inside `ohana-web/`
 
 ## Linear workflow
-- After completing a feature, creating a PR, merging, or opening/closing a related issue: update the Linear issue status and link the PR. This is mandatory, not optional.
+- Updating Linear is MANDATORY after: feature completion, adding a comment to an issue, creating a new task, merging a PR, or opening/closing an issue. Never skip this.
 - Use `mcp__claude_ai_Linear__save_issue` to set state to Done and attach the PR link via `links`.
-- After concluding a main feature, run `/release-prep` to update README, capture session learnings in CLAUDE.md, and generate a changelog entry before the next cycle.
+- Use `mcp__claude_ai_Linear__save_comment` to add a comment to an issue.
+- After concluding a main feature, ALWAYS run `/release-prep` — it updates README, captures session learnings in CLAUDE.md, generates a changelog entry, and is the standard wrap-up before starting the next cycle.
 
 ## Creator portal (`/portal`)
 - Auth gate: `requireAmbassador()` in `app/portal/layout.tsx` — covers all portal routes. API routes call `getPortalSession()` directly for a 401 on auth failure.
@@ -109,3 +110,16 @@
 - Used for the Stage 1 globe (`components/moment/GlobePicker.tsx`). Open-source — no Mapbox account, OSM vector tiles, globe projection.
 - Like Leaflet, it accesses `window` at import time — load via `dynamic(..., { ssr: false })` or import inside `useEffect`, never at module top level.
 - If MapLibre fails to load, `GlobePicker` degrades to a searchable country `<select>` driving the same `onChange`.
+
+## Dev ports
+- ohana-web runs on port 3002 (`npm run dev -- -p 3002`) — port 3000 is kawa, 3001 is ohana-admin.
+
+## Postgres (local dev tunnel)
+- The DB container is not port-exposed. Tunnel: `ssh -L 5433:10.10.16.3:5432 bla@10.0.0.42 -N -f`
+- Then set in `.env.local`: `DATABASE_URL=postgresql://ohana:KSNpxLGDNbO9fJmgWW7dN8qbajcghlNk@localhost:5433/ohana` and `DATABASE_SSL=disable`
+- Container name: `postgres-g6bos38cwqg7pjuit7c2yg0i-210604697309`
+
+## Creator portal (`/portal`)
+- `PORTAL_DEV_CREATOR_ID` in `.env.local` bypasses the creator auth gate in dev — set to a valid creator UUID.
+- A `dev-test` creator (UUID `2045ad69-8bf7-44a9-8c01-55355b47bf53`, slug `dev-test`) exists for local testing.
+- `stageImport` returns `inserted: 0` on re-import — correct behaviour, not a bug (`ON CONFLICT DO NOTHING`).

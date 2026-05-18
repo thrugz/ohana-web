@@ -1,5 +1,21 @@
 # Changelog
 
+## [v0.10.0] — 2026-05-19
+
+### Features
+- Add itinerary planner — `/plan/[id]` page with day-by-day view and email send button
+- Add `POST /api/plan/generate` — deterministic bin-packing itinerary from destination list
+- Add `GET /api/plan/[id]` and `POST /api/plan/[id]/send` — fetch and email itineraries via Resend
+- Add itinerary DB layer — `createItinerary`, `getItinerary`, `listItineraries`
+- Add creator CSV import — `POST /api/portal/guides/import` validates and stages rows into `raw_pois`
+- Wire "Your journeys" section on traveller home to `listItineraries`
+
+### Fixes
+- Fix XSS vulnerability in itinerary email by escaping HTML in place names
+- Fix plan send route error handling and add design token for error colour
+- Fix day header city casing and simplify `SendEmailButton`
+- Fix `createItinerary` to be atomic with UUID validation
+
 ## [v0.9.0] — 2026-05-18
 
 ### Features
