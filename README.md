@@ -28,12 +28,15 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 | `/ambassadors` | `app/(marketing)/ambassadors/page.tsx` | Ambassador programme hero, perks, apply form |
 | `/moment` | `app/moment/page.tsx` | Traveller onboarding — 5-stage Hoku-led interview producing the Mana (Digital Twin) |
 | `/discover` | `app/discover/page.tsx` | Destination discovery — mood/theme filtering, cluster cards, map |
-| `/home` | `app/home/page.tsx` | Traveller home (auth-gated) — Hoku greeting, visited countries, Explorer Badge, saved places |
-| `/portal` | `app/portal/page.tsx` | Ambassador portal (auth-gated, ambassador role required) — stats, content tools |
+| `/home` | `app/home/page.tsx` | Traveller home (auth-gated) — Hoku greeting, completeness bar, visited countries, Explorer Badge, saved places, Twin report export |
+| `/home/profile` | `app/home/profile/page.tsx` | Twin profile editor (auth-gated) — countries, preferred moods, themes; autosaves via PATCH `/api/twin/profile` |
+| `/portal` | `app/portal/page.tsx` | Ambassador portal (auth-gated, ambassador role required) — stats, payments, Mollie Connect |
 | `/sign-in` | `app/sign-in/page.tsx` | Authentication — sign in or create account; passkey (WebAuthn/FIDO2) + email/password fallback |
 | `*` | `app/not-found.tsx` | 404 — "This page doesn't exist. Yet." |
 
 The Moment flow is backed by four API routes under `app/api/moment/` — `session` (anonymous session), `commit` (per-stage signal), `hoku` (LLM proxy), `clusters` (mood-matched destinations).
+
+Twin profile API: `PATCH /api/twin/profile` (upsert visited countries / preferred moods / themes into `traveller_profile`), `GET /api/twin/export` (download JSON report). Discovery biasing: `GET /api/discover/wej` widens results with `OR moods && $preferred_moods` when the authenticated user has profile preferences.
 
 ## Key conventions
 

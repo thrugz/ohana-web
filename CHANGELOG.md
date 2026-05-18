@@ -1,5 +1,26 @@
 # Changelog
 
+## [v0.9.0] — 2026-05-18
+
+### Features
+
+- **Twin profile editor** (`/home/profile`) — auth-gated page to edit visited countries, preferred moods, and themes. Changes autosave via a 500 ms debounce calling `PATCH /api/twin/profile`. Vocabulary (available moods/themes) is fetched live from `poi_final`.
+- **`PATCH /api/twin/profile`** — upsert endpoint for `traveller_profile`. Accepts partial payloads; fields not sent are preserved via COALESCE. 401 on missing session.
+- **`GET /api/twin/export`** — download Twin report as JSON (`twin-report.json`). Includes name, Explorer Badge, visited countries, preferred moods/themes, and saved place names.
+- **`/home` completeness bar** — progress indicator (0/3, 1/3, 2/3, 3/3) based on countries, moods, and themes being filled. Links to `/home/profile` when incomplete.
+- **Profile nav link** — "Profile" link added to `HomeNav.tsx` pointing to `/home/profile`.
+- **Discovery biasing** (`GET /api/discover/wej`) — when the authenticated user has `preferredMoods` in their profile, the Wej query widens results with `OR moods && $preferred_moods` instead of exact-match only. Falls back silently if the profile fetch fails.
+- **`lib/twin/profile.ts`** — `getProfile` / `upsertProfile` data layer; `TravellerProfile` and `ProfilePatch` types.
+- **Portal payments page** (`/portal/payments`) — earnings summary, payout history, and sourced bookings list. Data layer in `lib/portal/payments.ts`.
+- **Mollie Connect OAuth** — `/api/portal/mollie/connect` redirect and `/api/portal/mollie/callback` exchange. Writes `mollie_org_id` to the `creator` row on success. Error banners surfaced on the portal OAuth page.
+- **`ohana-infra` migrations 057–071** applied to production: traveller auth tables (058), creator consolidation (062), merge hardening (068), passkey table (069), traveller profile table (070), `event_final` materialized view (071).
+
+### Fixes
+
+- Portal: `isUuid` guard on `creatorId`, error logging, `period_end` null safety, OAuth error banners.
+- Portal: `getPortalSession` resolves from the live traveller session correctly.
+- Lockfile regenerated on Linux to include `wasm` optional deps.
+
 ## [v0.8.0] — 2026-05-18
 
 ### Features

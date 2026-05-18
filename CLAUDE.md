@@ -77,9 +77,21 @@
 
 ## Traveller home (`/home`)
 - Gated by `requireTwin()` from `lib/auth/session.ts` — redirects to `/sign-in` if not authenticated.
-- `getTwinData()` in `lib/twin/data.ts` reads the most recent `anonymous_session` row linked to the user, plus POI details for saved places.
+- `getTwinData()` in `lib/twin/data.ts` reads the most recent `anonymous_session` row linked to the user, plus POI details for saved places. It also calls `getProfile()` in parallel — profile data takes priority over anonymous session data for `visitedCountries`.
 - `greeting()` in `lib/twin/greeting.ts` is a pure function (no I/O) — safe to call in Server Components with `new Date()`.
 - The "Your journeys" section is stubbed; tracked as Linear OHA-36. Itinerary builder is not available until W22+.
+
+## Traveller Twin profile (`lib/twin/profile.ts`)
+- `getProfile(userId)` returns `TravellerProfile | null` — null means no row yet, always use `?? []` defaults at call sites.
+- `upsertProfile(userId, patch)` does `INSERT ... ON CONFLICT (user_id) DO UPDATE SET visited_countries = COALESCE($2, EXCLUDED.visited_countries), ...` — pass only the fields you want to update; omitted fields are preserved via COALESCE.
+- `traveller_profile.user_id` has a UNIQUE constraint — one row per user, never insert duplicates.
+- The Profile page fetches POI vocabulary (moods/themes) via `SELECT DISTINCT unnest(moods) FROM poi_final WHERE operational_status = 'active'` — this can return empty arrays in dev if no POIs are enriched.
+
+## Discovery (`app/api/discover/wej/route.ts`)
+- `poi_final` has an `operational_status` column (not `status`) — the lifecycle column introduced in migration 043. Filter with `operational_status = 'active'`.
+- `poi_final.moods` and `poi_final.themes` are TEXT[] GIN-indexed — use `@>` (array containment) for exact single-value filtering, `&&` (overlap) for OR-style biasing.
+- `buildWejQueryBiased` widens the mood filter to `(moods @> $1 OR moods && $3)` when `preferredMoods` is non-empty — `$3` is the full preferred moods array. Returns to exact match when the array is empty.
+- The GET handler silently falls back to unbiased results if the session or profile fetch throws — discovery must never block on auth errors.
 
 ## MapLibre GL JS
 - Used for the Stage 1 globe (`components/moment/GlobePicker.tsx`). Open-source — no Mapbox account, OSM vector tiles, globe projection.
