@@ -19,6 +19,12 @@ export function HomeNav({ userName }: { userName?: string | null }) {
           Ohana
         </Link>
         <div className="flex items-center gap-4">
+          <Link
+            href="/home/profile"
+            className="text-sm text-muted hover:text-ink transition-colors"
+          >
+            Profile
+          </Link>
           {userName && (
             <span className="text-sm text-muted hidden sm:block">{userName}</span>
           )}

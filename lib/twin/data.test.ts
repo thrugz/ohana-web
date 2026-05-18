@@ -11,6 +11,9 @@ vi.mock("@/lib/moment/db", () => ({
   isUuid: (v: unknown) => typeof v === "string" && /^[0-9a-f-]{36}$/.test(v),
 }))
 
+// Mock profile — returns null by default
+vi.mock("@/lib/twin/profile", () => ({ getProfile: vi.fn().mockResolvedValue(null) }))
+
 // Clear React cache between tests
 vi.mock("react", async (importOriginal) => {
   const mod = await importOriginal<typeof import("react")>()

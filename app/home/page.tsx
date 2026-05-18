@@ -16,6 +16,40 @@ export default async function HomePage() {
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-8">
 
+      {/* ── Completeness bar ── */}
+      {twin && (() => {
+        const filled = [
+          twin.visitedCountries.length > 0,
+          twin.preferredMoods.length > 0,
+          twin.preferredThemes.length > 0,
+        ].filter(Boolean).length
+        const pct = Math.round((filled / 3) * 100)
+        return (
+          <section className="mb-6 px-4">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] uppercase tracking-widest" style={{ color: "var(--color-muted)" }}>
+                Twin completeness
+              </span>
+              <span className="text-[11px]" style={{ color: "var(--color-muted)" }}>{pct}%</span>
+            </div>
+            <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--color-line)" }}>
+              <div
+                className="h-full rounded-full transition-all"
+                style={{ width: `${pct}%`, background: "var(--color-clay)" }}
+              />
+            </div>
+            {pct < 100 && (
+              <p className="mt-1 text-[12px]" style={{ color: "var(--color-muted)" }}>
+                <a href="/home/profile" className="underline underline-offset-2 hover:text-ink transition-colors">
+                  Complete your profile
+                </a>{" "}
+                to get better recommendations.
+              </p>
+            )}
+          </section>
+        )
+      })()}
+
       {/* ── Hoku greeting ── */}
       <HokuThread>
         <HokuMessage from="hoku">
@@ -140,6 +174,18 @@ export default async function HomePage() {
             Full trip archives and day-by-day itineraries are coming in a future update.
           </p>
         </div>
+      </section>
+
+      {/* ── Export ── */}
+      <section className="mt-6 px-4">
+        <a
+          href="/api/twin/export"
+          download="twin-report.json"
+          className="text-sm underline underline-offset-2 hover:text-ink transition-colors"
+          style={{ color: "var(--color-muted)" }}
+        >
+          Download your Twin report
+        </a>
       </section>
 
     </div>

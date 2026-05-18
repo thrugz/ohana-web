@@ -2,6 +2,7 @@ import { cache } from "react"
 import { getTwinSession } from "@/lib/auth/session"
 import { getPool } from "@/lib/moment/db"
 import { explorerBadge } from "@/lib/moment/explorerBadge"
+import { getProfile } from "@/lib/twin/profile"
 
 export interface SavedPoi {
   id: string
@@ -18,6 +19,8 @@ export interface TwinData {
   portrait: string | null
   explorerBadge: string
   savedPois: SavedPoi[]
+  preferredMoods: string[]
+  preferredThemes: string[]
 }
 
 export const getTwinData = cache(async (): Promise<TwinData | null> => {
@@ -26,22 +29,25 @@ export const getTwinData = cache(async (): Promise<TwinData | null> => {
 
   const pool = getPool()
 
-  const sessionRow = await pool.query<{
-    visited_countries: string[]
-    moods: string[]
-    mana_summary: { explorerBadge?: string; portrait?: string } | null
-    saved_pois: string[] | null
-  }>(
-    `SELECT visited_countries, moods, mana_summary, saved_pois
-     FROM anonymous_session
-     WHERE linked_user_id = $1
-     ORDER BY completed_at DESC NULLS LAST
-     LIMIT 1`,
-    [session.user.id],
-  )
+  const [sessionRow, profile] = await Promise.all([
+    pool.query<{
+      visited_countries: string[]
+      moods: string[]
+      mana_summary: { explorerBadge?: string; portrait?: string } | null
+      saved_pois: string[] | null
+    }>(
+      `SELECT visited_countries, moods, mana_summary, saved_pois
+       FROM anonymous_session
+       WHERE linked_user_id = $1
+       ORDER BY completed_at DESC NULLS LAST
+       LIMIT 1`,
+      [session.user.id],
+    ),
+    getProfile(session.user.id),
+  ])
 
   const row = sessionRow.rows[0]
-  const visitedCountries = row?.visited_countries ?? []
+  const visitedCountries = profile?.visitedCountries ?? row?.visited_countries ?? []
   const moods = row?.moods ?? []
   const portrait = row?.mana_summary?.portrait ?? null
   const rawSavedPoiIds = row?.saved_pois ?? []
@@ -76,5 +82,7 @@ export const getTwinData = cache(async (): Promise<TwinData | null> => {
     portrait,
     explorerBadge: explorerBadge(visitedCountries.length),
     savedPois,
+    preferredMoods: profile?.preferredMoods ?? moods,
+    preferredThemes: profile?.preferredThemes ?? [],
   }
 })
