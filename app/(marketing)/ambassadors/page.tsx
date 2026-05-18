@@ -147,9 +147,9 @@ function HeroContent() {
 // ---------------------------------------------------------------------------
 
 const perks = [
-  { num: "01", label: "Early access to every new feature" },
-  { num: "02", label: "Free Ohana Premium — for life" },
-  { num: "03", label: "Travel credit every time someone joins through you" },
+  { num: "01", label: "Earn every time your POI appears in a paid itinerary" },
+  { num: "02", label: "€5–8 referral commission on every new subscriber you bring in" },
+  { num: "03", label: "€750 minimum guaranteed — for Anchor Ambassadors, every year" },
 ]
 
 function WhatIsAmbassador() {
@@ -187,8 +187,8 @@ function WhatIsAmbassador() {
           color: "var(--color-ink)",
         }}
       >
-        Part advocate. Part insider.{" "}
-        <span style={{ fontStyle: "italic" }}>All you.</span>
+        Your knowledge builds itineraries.{" "}
+        <span style={{ fontStyle: "italic" }}>You earn from every trip.</span>
       </motion.h2>
 
       <div className="grid gap-12 md:grid-cols-2 md:gap-20">
@@ -201,10 +201,10 @@ function WhatIsAmbassador() {
             className="mb-5 text-[15px] leading-relaxed"
             style={{ color: "var(--color-muted)" }}
           >
-            You already do it naturally — sending voice notes about that one restaurant, texting
-            &ldquo;you have to go here&rdquo; before someone&apos;s trip. As an Ohana Ambassador, that instinct
-            becomes something more. Your recommendations carry more weight, and you get the credit
-            they deserve.
+            You&apos;ve spent years finding the good stuff — the restaurant nobody writes about,
+            the trail that rewards the people who show up. As an Ohana Ambassador, your POIs
+            become the engine behind personalised itineraries for paying members. Every time
+            we use your content, you earn.
           </motion.p>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -213,9 +213,8 @@ function WhatIsAmbassador() {
             className="text-[15px] leading-relaxed"
             style={{ color: "var(--color-muted)" }}
           >
-            Ambassadors get early access to every feature before it ships, direct input into what
-            we build next, and a community of real travellers — people who explore for the love of
-            it, not the content.
+            No exclusivity. No content quotas. Your IP stays yours — we just put it to work
+            for travellers who actually want it.
           </motion.p>
         </div>
 
@@ -271,26 +270,26 @@ function WhatIsAmbassador() {
 
 const perksCards = [
   {
-    id: "first",
+    id: "poi",
     icon: "✦",
-    title: "Be first.",
-    body: "Early access to features two weeks before everyone else. Shape what Ohana becomes by living with it first.",
+    title: "POI usage revenue.",
+    body: "20% of every paid itinerary goes to a creator pool, split across the POIs used. First upload owns it, in perpetuity.",
     bg: "var(--color-clay-soft)",
     dark: false,
   },
   {
-    id: "travel",
+    id: "referral",
     icon: "◎",
-    title: "Travel free.",
-    body: "Earn Ohana credit for every friend who joins through your link. Use it toward any trip, any time.",
+    title: "Referral commissions.",
+    body: "€5 on every Tour Plan, €8 on every annual subscription your audience brings in. 30-day cookie, first-touch attribution.",
     bg: "var(--color-ink)",
     dark: true,
   },
   {
-    id: "product",
+    id: "guarantee",
     icon: "◈",
-    title: "Shape the product.",
-    body: "Join direct calls with the Ohana team. Your travels, your feedback — that's our roadmap.",
+    title: "€750 Anchor guarantee.",
+    body: "Publish 200+ POIs within 90 days and become an Anchor. We guarantee €750 in your first year — we pay the gap if you fall short.",
     bg: "var(--color-sage-soft)",
     dark: false,
   },
@@ -388,17 +387,17 @@ const joinSteps = [
   {
     num: "01",
     title: "Apply",
-    body: "Takes two minutes. Tell us a little about how you travel and why Ohana feels like yours.",
+    body: "Two minutes. Tell us where you travel and what kind of POIs you have. We review every application personally.",
   },
   {
     num: "02",
-    title: "Get your code",
-    body: "We send you a referral code unique to you. No setup, no dashboard to learn — it just works.",
+    title: "Upload your POIs",
+    body: "We onboard you to the creator portal. Import from Rexby or upload directly. Your content, your call on what goes in.",
   },
   {
     num: "03",
-    title: "Share and earn",
-    body: "Share Ohana the way you already would. Every person who joins through you earns you credit. Indefinitely.",
+    title: "Earn from every trip",
+    body: "Each time your POI appears in a paid itinerary, you get a cut. No minimums. No quotas. Monthly payouts via Mollie.",
   },
 ]
 
@@ -539,7 +538,17 @@ function ApplicationForm() {
     e.preventDefault()
     if (state !== "idle") return
     setState("loading")
-    await new Promise((r) => setTimeout(r, 800))
+    try {
+      const res = await fetch("/api/ambassadors/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
+      })
+      if (!res.ok) throw new Error("submit failed")
+    } catch {
+      setState("idle")
+      return
+    }
     setState("success")
     setParticles(
       Array.from({ length: 8 }, (_, i) => ({
