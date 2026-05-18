@@ -3,6 +3,15 @@ import type { Itinerary } from "./types"
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+}
+
 function buildHtml(itinerary: Itinerary): string {
   const daysHtml = itinerary.days
     .map((day) => {
@@ -11,9 +20,9 @@ function buildHtml(itinerary: Itinerary): string {
           (item) => `
         <tr>
           <td style="padding:10px 0;border-bottom:1px solid #e5e0d8;">
-            <strong style="display:block;font-size:15px;color:#2a2218;">${item.name}</strong>
-            ${item.cityName ? `<span style="font-size:11px;color:#8a7e6e;text-transform:capitalize;">${item.cityName}</span>` : ""}
-            ${item.shortDescription ? `<p style="margin:4px 0 0;font-size:13px;color:#8a7e6e;line-height:1.4;">${item.shortDescription}</p>` : ""}
+            <strong style="display:block;font-size:15px;color:#2a2218;">${escapeHtml(item.name)}</strong>
+            ${item.cityName ? `<span style="font-size:11px;color:#8a7e6e;text-transform:capitalize;">${escapeHtml(item.cityName)}</span>` : ""}
+            ${item.shortDescription ? `<p style="margin:4px 0 0;font-size:13px;color:#8a7e6e;line-height:1.4;">${escapeHtml(item.shortDescription)}</p>` : ""}
           </td>
         </tr>`,
         )
@@ -30,7 +39,7 @@ function buildHtml(itinerary: Itinerary): string {
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Georgia,serif;max-width:600px;margin:0 auto;padding:32px 24px;color:#2a2218;background:#faf7f2;">
-  <h1 style="font-size:28px;font-weight:400;margin-bottom:4px;line-height:1.1;">${itinerary.title}</h1>
+  <h1 style="font-size:28px;font-weight:400;margin-bottom:4px;line-height:1.1;">${escapeHtml(itinerary.title)}</h1>
   <p style="font-size:13px;color:#8a7e6e;margin-top:4px;">Your Ohana itinerary</p>
   ${daysHtml}
   <hr style="border:none;border-top:1px solid #e5e0d8;margin:32px 0;">
