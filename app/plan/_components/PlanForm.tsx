@@ -95,7 +95,7 @@ export function PlanForm({ savedPois }: { savedPois: SavedPoi[] }) {
         </div>
 
         {error && (
-          <p className="text-sm mb-4" style={{ color: "oklch(0.5 0.2 27)" }}>
+          <p className="text-sm mb-4" style={{ color: "var(--color-clay)" }}>
             {error}
           </p>
         )}

@@ -24,6 +24,10 @@ export async function POST(
     return NextResponse.json({ error: "Not found" }, { status: 404 })
   }
 
-  await sendItineraryEmail(session.user.email, itinerary)
+  try {
+    await sendItineraryEmail(session.user.email, itinerary)
+  } catch {
+    return NextResponse.json({ error: "Failed to send email" }, { status: 500 })
+  }
   return NextResponse.json({ sent: true })
 }
