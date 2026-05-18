@@ -1,4 +1,4 @@
-import { BrevoClient } from "@getbrevo/brevo"
+import nodemailer from "nodemailer"
 import type { Itinerary } from "./types"
 
 function escapeHtml(s: string): string {
@@ -49,16 +49,28 @@ function buildHtml(itinerary: Itinerary): string {
 }
 
 export async function sendItineraryEmail(to: string, itinerary: Itinerary): Promise<void> {
-  if (!process.env.BREVO_API_KEY) {
-    console.log("[email] BREVO_API_KEY not set — skipping send")
+  const { BREVO_SMTP_HOST, BREVO_SMTP_PORT, BREVO_SMTP_USER, BREVO_SMTP_PASS } = process.env
+
+  if (!BREVO_SMTP_HOST || !BREVO_SMTP_USER || !BREVO_SMTP_PASS) {
+    console.log("[email] SMTP credentials not set — skipping send")
     return
   }
 
-  const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY })
-  await brevo.transactionalEmails.sendTransacEmail({
-    sender: { email: "hello@ohana.travel", name: "Ohana" },
-    to: [{ email: to }],
+  const transport = nodemailer.createTransport({
+    host: BREVO_SMTP_HOST,
+    port: BREVO_SMTP_PORT ? parseInt(BREVO_SMTP_PORT, 10) : 587,
+    secure: false,
+    requireTLS: true,
+    auth: {
+      user: BREVO_SMTP_USER,
+      pass: BREVO_SMTP_PASS,
+    },
+  })
+
+  await transport.sendMail({
+    from: '"Ohana" <hello@ohana.travel>',
+    to,
     subject: itinerary.title,
-    htmlContent: buildHtml(itinerary),
+    html: buildHtml(itinerary),
   })
 }
