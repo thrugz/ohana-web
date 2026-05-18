@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import createMollieClient, { OAuthGrantType } from "@mollie/api-client"
-import { getPool } from "@/lib/moment/db"
+import { getPool, isUuid } from "@/lib/moment/db"
 import { getPortalSession } from "@/lib/portal/session"
 
 // Canonical-table write: scoped to session creator's own row, payout columns only.
@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
   const session = await getPortalSession()
   if (!session) {
     return new NextResponse("Unauthorized", { status: 401 })
+  }
+
+  if (!isUuid(session.creatorId)) {
+    return new NextResponse("Bad session", { status: 400 })
   }
 
   const { searchParams } = request.nextUrl
@@ -58,7 +62,8 @@ export async function GET(request: NextRequest) {
     const response = NextResponse.redirect(new URL("/portal/payments?connected=1", request.url))
     response.cookies.set("mollie_oauth_state", "", { maxAge: 0, path: "/" })
     return response
-  } catch {
+  } catch (err) {
+    console.error("[mollie/callback] OAuth flow failed:", err)
     return NextResponse.redirect(new URL("/portal/payments?error=connect_failed", request.url))
   }
 }

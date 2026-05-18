@@ -7,7 +7,12 @@ import {
   getSourcedBookings,
 } from "@/lib/portal/payments"
 
-export default async function PaymentsPage() {
+export default async function PaymentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; connected?: string }>
+}) {
+  const params = await searchParams
   const record = await getAmbassadorRecord()
   if (!record) return null
 
@@ -23,6 +28,20 @@ export default async function PaymentsPage() {
           Payments
         </h1>
       </header>
+
+      {params.error && (
+        <div className="rounded-lg border border-line bg-surface px-6 py-4 text-sm text-clay">
+          {params.error === "state_mismatch"
+            ? "Connection failed: security check did not pass. Please try again."
+            : "Could not connect to Mollie. Please try again."}
+        </div>
+      )}
+
+      {params.connected === "1" && !notConnected && (
+        <div className="rounded-lg border border-line bg-surface px-6 py-4 text-sm text-sage">
+          Mollie account connected. Your account is now under review.
+        </div>
+      )}
 
       {notConnected && (
         <section className="rounded-lg border border-line bg-surface p-8 text-center space-y-4">
@@ -98,8 +117,8 @@ async function EarningsData({ creatorId }: { creatorId: string }) {
           <Table
             head={["Period", "Amount", "Reference", "Status"]}
             rows={payouts.map((p) => [
-              p.period_start
-                ? `${new Date(p.period_start).toLocaleDateString("en-GB")} – ${new Date(p.period_end!).toLocaleDateString("en-GB")}`
+              p.period_start && p.period_end
+                ? `${new Date(p.period_start).toLocaleDateString("en-GB")} – ${new Date(p.period_end).toLocaleDateString("en-GB")}`
                 : "—",
               fmt(p.total_amount),
               p.mollie_reference ?? "—",
