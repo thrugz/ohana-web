@@ -1,7 +1,5 @@
-import { Resend } from "resend"
+import { BrevoClient } from "@getbrevo/brevo"
 import type { Itinerary } from "./types"
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 function escapeHtml(s: string): string {
   return s
@@ -51,10 +49,16 @@ function buildHtml(itinerary: Itinerary): string {
 }
 
 export async function sendItineraryEmail(to: string, itinerary: Itinerary): Promise<void> {
-  await resend.emails.send({
-    from: "Ohana <hello@ohana.travel>",
-    to,
+  if (!process.env.BREVO_API_KEY) {
+    console.log("[email] BREVO_API_KEY not set — skipping send")
+    return
+  }
+
+  const brevo = new BrevoClient({ apiKey: process.env.BREVO_API_KEY })
+  await brevo.transactionalEmails.sendTransacEmail({
+    sender: { email: "hello@ohana.travel", name: "Ohana" },
+    to: [{ email: to }],
     subject: itinerary.title,
-    html: buildHtml(itinerary),
+    htmlContent: buildHtml(itinerary),
   })
 }

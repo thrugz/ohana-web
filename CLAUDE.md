@@ -69,8 +69,9 @@ You are the implementation agent for **ohana-web** — the traveller-facing Next
 - Challenge storage for WebAuthn uses `internalAdapter.createVerificationValue` / `consumeVerificationValue`.
 - Anonymous session linking runs in both register and authenticate endpoints.
 
-### Email (Resend)
-- `RESEND_API_KEY` env var — if absent, `sendItineraryEmail` is a no-op (console.log in dev, returns early). Never throw.
+### Email (Brevo)
+- `BREVO_API_KEY` env var — if absent, `sendItineraryEmail` is a no-op (console.log in dev, returns early). Never throw.
+- Uses `BrevoClient` from `@getbrevo/brevo` v5. Call pattern: `new BrevoClient({ apiKey })` then `brevo.transactionalEmails.sendTransacEmail({ sender, to, subject, htmlContent })`.
 
 ### Dev server
 - Port 3002: `npm run dev -- -p 3002`
