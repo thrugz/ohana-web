@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { getAmbassadorRecord, humanizeCreatorType } from "@/lib/portal/ambassador"
+import { getSubmittedGuides } from "@/lib/portal/guides"
+import { GuidesSection } from "./_components/GuidesSection"
 
 const TIER_LABELS: Record<string, string> = {
   "80_20_creator": "80/20",
@@ -17,6 +19,7 @@ export default async function PortalPage() {
   // layout already enforces the gate; record is guaranteed non-null and active here
   const record = await getAmbassadorRecord()
   if (!record) return null
+  const guides = await getSubmittedGuides(record.slug)
 
   const tierLabel = record.revenue_share_tier ? TIER_LABELS[record.revenue_share_tier] : null
   const statusStyle = STATUS_STYLES[record.status] ?? "bg-line text-muted"
@@ -51,7 +54,7 @@ export default async function PortalPage() {
 
       <section>
         <h2 className="text-xs uppercase tracking-widest text-muted mb-4">Your guides</h2>
-        <ComingSoon />
+        <GuidesSection initialGuides={guides} />
       </section>
 
       <section>
@@ -72,14 +75,6 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
     <div>
       <dt className="text-xs text-muted mb-1">{label}</dt>
       <dd className="text-sm text-ink">{children}</dd>
-    </div>
-  )
-}
-
-function ComingSoon() {
-  return (
-    <div className="rounded-lg border border-line bg-surface p-8 text-center">
-      <p className="text-sm text-muted">Coming soon</p>
     </div>
   )
 }
