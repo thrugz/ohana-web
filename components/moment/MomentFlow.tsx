@@ -18,7 +18,22 @@ const STAGES = {
 // Client host for the Moment flow: drives the session machine and renders
 // the stage component matching the current stage.
 export function MomentFlow() {
-  const { state, commit, advanceStage, loading } = useMomentSession()
+  const { state, commit, advanceStage, loading, error, retry } = useMomentSession()
+
+  if (error) {
+    return (
+      <div className="flex min-h-dvh flex-col items-center justify-center gap-4 text-muted">
+        <p>We couldn&apos;t start your session.</p>
+        <button
+          type="button"
+          onClick={retry}
+          className="rounded-full bg-clay px-5 py-2 text-sm text-primary-foreground"
+        >
+          Try again
+        </button>
+      </div>
+    )
+  }
 
   if (loading || !state) {
     return <div className="flex min-h-dvh items-center justify-center text-muted">Loading…</div>

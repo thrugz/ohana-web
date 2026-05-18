@@ -57,12 +57,29 @@
 - Anonymous data accumulates in the PostgreSQL `anonymous_session` table (ohana-infra migration 043), keyed by an httpOnly cookie token. Better-Auth links it to a real account on signup.
 - Brand vocabulary: engineering says *Twin*, the UI/Hoku say **Mana**. The Stage 4 reveal is the **Moods Atlas**. **Explorer Badge** is a deterministic tier from countries-visited count (The Curious / Explorer / Adventurer / Wanderer / Nomad / Legend) — "Wanderer" is a tier, never a generated name.
 
+## Better-Auth (`lib/auth/`)
+- `advanced: { database: { generateId: "uuid" } }` is load-bearing. Without it, Better-Auth generates base62 IDs that crash UUID columns in Postgres.
+- Better-Auth 1.6.x has no built-in passkey plugin. The custom `travellerPasskeyPlugin` in `lib/auth/passkey-plugin.ts` uses `createAuthEndpoint` + `@simplewebauthn/server` v13 directly.
+- `lib/db/client.ts` creates the pg Pool with `process.env.DATABASE_URL ?? ""` (no throw at module load). Connection errors surface at query time, not import time — Next.js build loads the module early.
+- Challenge storage for WebAuthn uses `internalAdapter.createVerificationValue` / `consumeVerificationValue` on the existing `traveller_verifications` table. Keys: `passkey-reg:${email}` for registration, `passkey-auth:${challengeId}` for sign-in.
+- Anonymous session linking (`UPDATE anonymous_session SET linked_user_id = $1 WHERE id = $2 AND linked_user_id IS NULL`) runs in both register and authenticate endpoints after a session is created.
+
+## @simplewebauthn/server v13
+- `verifyRegistrationResponse` returns `registrationInfo.credential` (not `credential.deviceType`). Device type and backed-up flag are at `registrationInfo.credentialDeviceType` and `registrationInfo.credentialBackedUp`.
+- `registrationInfo.aaguid` is available directly on the registrationInfo object.
+
 ## WebAuthn / Passkeys (`/sign-in`)
 - RP ID is `NEXT_PUBLIC_PASSKEY_RP_ID` env var, defaulting to `window.location.hostname`. Set it to `ohana.place` before any passkey registration goes live in production — credentials are bound to the RP ID at creation and cannot be migrated across domains.
+- Origin for WebAuthn verification is `NEXT_PUBLIC_SITE_ORIGIN`, defaulting to `https://${rpID}`.
 - `authenticatorAttachment: "platform"` + `residentKey: "required"` — device-bound, discoverable credentials only (Face ID / Touch ID / Windows Hello). No roaming hardware keys.
-- The backend verification stubs live in `passkeyRegister` and `passkeyAuthenticate` in `app/sign-in/page.tsx` — marked with `TODO` comments. Wire them to Better Auth when the auth backend is ready.
-- Sign-in tab calls `credentials.get()` with no `allowCredentials` — the browser shows its native account picker. No email field needed on that path.
+- Sign-in tab calls `/api/auth/passkey/auth-options` (no allowCredentials) → browser shows native account picker. No email field needed on that path.
 - `NotAllowedError` from `credentials.create/get` = user cancelled; treat as idle, not an error.
+
+## Traveller home (`/home`)
+- Gated by `requireTwin()` from `lib/auth/session.ts` — redirects to `/sign-in` if not authenticated.
+- `getTwinData()` in `lib/twin/data.ts` reads the most recent `anonymous_session` row linked to the user, plus POI details for saved places.
+- `greeting()` in `lib/twin/greeting.ts` is a pure function (no I/O) — safe to call in Server Components with `new Date()`.
+- The "Your journeys" section is stubbed; tracked as Linear OHA-36. Itinerary builder is not available until W22+.
 
 ## MapLibre GL JS
 - Used for the Stage 1 globe (`components/moment/GlobePicker.tsx`). Open-source — no Mapbox account, OSM vector tiles, globe projection.

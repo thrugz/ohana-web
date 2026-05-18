@@ -11,6 +11,8 @@ interface UseMomentSession {
   commit: (patch: CommitPatch) => Promise<void>
   advanceStage: () => Promise<void>
   loading: boolean
+  error: boolean
+  retry: () => void
 }
 
 // Loads the anonymous session on mount and persists stage signals. commit
@@ -18,22 +20,35 @@ interface UseMomentSession {
 export function useMomentSession(): UseMomentSession {
   const [state, setState] = useState<MomentState | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [attempt, setAttempt] = useState(0)
+
+  const retry = useCallback(() => {
+    setAttempt((n) => n + 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setError(false)
     fetch("/api/moment/session")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`session fetch failed: ${res.status}`)
+        return res.json()
+      })
       .then((data: MomentState) => {
         if (!cancelled) setState(data)
       })
-      .catch(() => {})
+      .catch(() => {
+        if (!cancelled) setError(true)
+      })
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [attempt])
 
   const commit = useCallback(
     async (patch: CommitPatch) => {
@@ -74,5 +89,5 @@ export function useMomentSession(): UseMomentSession {
     await commit({ currentStage: advance(state.currentStage) })
   }, [state, commit])
 
-  return { state, commit, advanceStage, loading }
+  return { state, commit, advanceStage, loading, error, retry }
 }

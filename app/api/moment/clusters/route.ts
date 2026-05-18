@@ -30,11 +30,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Invalid session" }, { status: 400 })
   }
 
-  const pool = getPool()
-
   let moods: string[] = []
   try {
-    const result = await pool.query<{ moods: string[] }>(
+    const result = await getPool().query<{ moods: string[] }>(
       "SELECT moods FROM anonymous_session WHERE id = $1",
       [sessionId],
     )
@@ -45,25 +43,11 @@ export async function GET(req: Request) {
 
   const clusters = clustersForMoods(moods)
 
-  const cards: ClusterCard[] = await Promise.all(
-    clusters.map(async (cluster) => {
-      // Surface real KGE destinations for the cluster's moods. A thin or
-      // empty poi_final must not break the card — it is about the theme.
-      try {
-        await pool.query(
-          "SELECT name FROM poi_final WHERE moods && $1 AND status = 'active' LIMIT 1",
-          [cluster.moods],
-        )
-      } catch {
-        // poi_final not ready — the cluster card still renders.
-      }
-      return {
-        id: cluster.id,
-        title: cluster.title,
-        image: CLUSTER_IMAGE[cluster.id] ?? PLACEHOLDER,
-      }
-    }),
-  )
+  const cards: ClusterCard[] = clusters.map((cluster) => ({
+    id: cluster.id,
+    title: cluster.title,
+    image: CLUSTER_IMAGE[cluster.id] ?? PLACEHOLDER,
+  }))
 
   return NextResponse.json(cards)
 }

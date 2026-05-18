@@ -6,59 +6,50 @@ import Image from "next/image"
 import { Fingerprint } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { useRouter } from "next/navigation"
+import { startRegistration, startAuthentication } from "@simplewebauthn/browser"
+import { authClient } from "@/lib/auth/client"
 
-// ── WebAuthn helpers ──────────────────────────────────────────────────────────
+// ── WebAuthn passkey helpers ──────────────────────────────────────────────────
 
-function getPasskeyRpId(): string {
-  return process.env.NEXT_PUBLIC_PASSKEY_RP_ID ?? window.location.hostname
-}
-
-async function passkeyRegister(email: string, displayName: string): Promise<boolean> {
+async function passkeyRegister(email: string, name: string): Promise<boolean> {
   if (!window.PublicKeyCredential) return false
-  const rpId = getPasskeyRpId()
-  const credential = await navigator.credentials.create({
-    publicKey: {
-      challenge: crypto.getRandomValues(new Uint8Array(32)),
-      rp: { name: "Ohana", id: rpId },
-      user: {
-        id: crypto.getRandomValues(new Uint8Array(16)),
-        name: email,
-        displayName,
-      },
-      pubKeyCredParams: [
-        { alg: -7, type: "public-key" },   // ES256
-        { alg: -257, type: "public-key" }, // RS256
-      ],
-      authenticatorSelection: {
-        authenticatorAttachment: "platform",
-        requireResidentKey: true,
-        residentKey: "required",
-        userVerification: "required",
-      },
-      timeout: 60_000,
-      attestation: "none",
-    },
-  }) as PublicKeyCredential | null
-  if (!credential) return false
-  // TODO: send credential to backend when Better Auth is wired up
-  localStorage.setItem("ohana_passkey_id", credential.id)
-  return true
+
+  const optRes = await fetch("/api/auth/passkey/register-options", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  })
+  if (!optRes.ok) return false
+  const options = await optRes.json()
+
+  const credential = await startRegistration({ optionsJSON: options })
+
+  const regRes = await fetch("/api/auth/passkey/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, name, credential }),
+  })
+  return regRes.ok
 }
 
 async function passkeyAuthenticate(): Promise<boolean> {
   if (!window.PublicKeyCredential) return false
-  const rpId = getPasskeyRpId()
-  const assertion = await navigator.credentials.get({
-    publicKey: {
-      challenge: crypto.getRandomValues(new Uint8Array(32)),
-      rpId,
-      userVerification: "required",
-      timeout: 60_000,
-    },
-  }) as PublicKeyCredential | null
-  if (!assertion) return false
-  // TODO: verify assertion on backend when Better Auth is wired up
-  return true
+
+  const optRes = await fetch("/api/auth/passkey/auth-options", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+  })
+  if (!optRes.ok) return false
+  const { challengeId, ...options } = await optRes.json()
+
+  const credential = await startAuthentication({ optionsJSON: options })
+
+  const authRes = await fetch("/api/auth/passkey/authenticate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ challengeId, credential }),
+  })
+  return authRes.ok
 }
 
 // ── FloatingInput ─────────────────────────────────────────────────────────────
@@ -140,6 +131,7 @@ export default function SignInPage() {
   const [name, setName] = useState("")
   const [loading, setLoading] = useState(false)
   const [passkeyState, setPasskeyState] = useState<PasskeyState>("idle")
+  const [formError, setFormError] = useState("")
   const router = useRouter()
 
   const handlePasskey = useCallback(async () => {
@@ -148,6 +140,7 @@ export default function SignInPage() {
       return
     }
     setPasskeyState("pending")
+    setFormError("")
     try {
       let ok: boolean
       if (mode === "signup") {
@@ -155,8 +148,11 @@ export default function SignInPage() {
       } else {
         ok = await passkeyAuthenticate()
       }
-      if (ok) router.push("/moment")
-      else setPasskeyState("idle")
+      if (ok) {
+        router.push("/home")
+      } else {
+        setPasskeyState("error")
+      }
     } catch (err) {
       // NotAllowedError = user cancelled — treat as idle, not an error
       if (err instanceof DOMException && err.name === "NotAllowedError") {
@@ -170,8 +166,24 @@ export default function SignInPage() {
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 900))
-    router.push("/moment")
+    setFormError("")
+    try {
+      if (mode === "signup") {
+        const { error } = await authClient.signUp.email({
+          email,
+          password,
+          name: name || email.split("@")[0],
+        })
+        if (error) { setFormError(error.message ?? "Sign-up failed"); setLoading(false); return }
+      } else {
+        const { error } = await authClient.signIn.email({ email, password })
+        if (error) { setFormError(error.message ?? "Sign-in failed"); setLoading(false); return }
+      }
+      router.push("/home")
+    } catch {
+      setFormError("Something went wrong — please try again")
+      setLoading(false)
+    }
   }
 
   const passkeyDisabled = mode === "signup" && email.trim() === ""
@@ -272,7 +284,7 @@ export default function SignInPage() {
             {/* Tab switcher */}
             <div className="flex mb-7 border-b" style={{ borderColor: "var(--color-line)" }}>
               {(["signin", "signup"] as const).map((m) => (
-                <button key={m} type="button" onClick={() => { setMode(m); setPasskeyState("idle") }}
+                <button key={m} type="button" onClick={() => { setMode(m); setPasskeyState("idle"); setFormError("") }}
                   className="relative bg-transparent border-none cursor-pointer"
                   style={{
                     color: mode === m ? "var(--color-ink)" : "var(--color-muted)",
@@ -376,6 +388,10 @@ export default function SignInPage() {
                     Forgot password?
                   </button>
                 </div>
+              )}
+
+              {formError && (
+                <p className="text-[12px]" style={{ color: "oklch(0.62 0.18 25)" }}>{formError}</p>
               )}
 
               <motion.button

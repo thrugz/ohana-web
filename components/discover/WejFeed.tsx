@@ -1,7 +1,7 @@
 "use client"
 
 import { WejCard } from "./WejCard"
-import { WEJ_CARD_TARGET, type Wej } from "@/lib/discover/types"
+import type { Wej } from "@/lib/discover/types"
 
 interface WejFeedProps {
   wej: Wej
@@ -29,12 +29,8 @@ export function WejFeed({ wej, savedPoiIds, onToggleSave }: WejFeedProps) {
         {introLine(wej)}
       </p>
 
-      {wej.cards.length < WEJ_CARD_TARGET && (
-        <p className="text-muted text-sm">
-          {wej.thin
-            ? "A small, hand-picked set this time — still worth a look."
-            : "A small, hand-picked set — only the places that genuinely fit."}
-        </p>
+      {wej.thin && (
+        <p className="text-muted text-sm">A small, hand-picked set this time — still worth a look.</p>
       )}
 
       <div className="flex flex-col gap-4">

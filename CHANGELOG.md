@@ -1,5 +1,38 @@
 # Changelog
 
+## [v0.8.0] — 2026-05-18
+
+### Features
+
+- **Better-Auth wiring** — full traveller auth stack: `lib/db/schema.ts` (Drizzle pgTable definitions for all `traveller_*` tables), `lib/db/client.ts` (pooled pg singleton), `lib/auth/config.ts` (betterAuth + drizzleAdapter), `app/api/auth/[...all]/route.ts`. UUID generation is forced via `advanced.database.generateId: "uuid"` — base62 IDs crash Postgres UUID columns.
+- **Custom passkey plugin** (`lib/auth/passkey-plugin.ts`) — Better-Auth 1.6.x has no built-in passkey plugin; implemented `travellerPasskeyPlugin` with four endpoints (`/passkey/register-options`, `/passkey/register`, `/passkey/auth-options`, `/passkey/authenticate`) using `@simplewebauthn/server` v13. Challenges stored via Better-Auth's internal adapter on `traveller_verifications`.
+- **Anonymous session linking** — after passkey register or authenticate, the `moment_session` cookie is read and `anonymous_session.linked_user_id` is set, connecting the anonymous Mana to the new account.
+- **`/home` route** (auth-gated) — traveller home with time-of-day and holiday-aware Hoku greeting, "Where you've been" country image strip, Explorer Badge, Mana portrait, saved places, and a stubbed "Your journeys" section (tracked OHA-36).
+- **Infra migration 066** (`ohana-infra`) — `traveller_passkey` table for WebAuthn credential storage.
+- **Sign-in page rewired** — `passkeyRegister` and `passkeyAuthenticate` now call the real Better-Auth endpoints via `@simplewebauthn/browser`. Email/password routes through `authClient.signIn.email` / `authClient.signUp.email`. On success redirects to `/home`.
+
+### Notes
+
+- Apply `ohana-infra/migrations/066_traveller_passkey.sql` before passkey registration works in dev.
+- Set `NEXT_PUBLIC_PASSKEY_RP_ID=ohana.place` and `NEXT_PUBLIC_SITE_ORIGIN=https://ohana.place` before any production registrations.
+- Journeys section is stubbed pending the Itinerary Builder (W22+, OHA-36).
+
+## [v0.7.0] — 2026-05-18
+
+### Features
+
+- **Ambassador portal** (`/portal`) — auth-gated section for users with `ambassador` role: stats, links, content tools.
+- **Discover route** (`/discover`) — destination discovery with mood/theme filtering, cluster cards, and map view. Cold-start mood pick when no Mana exists; thin-data framing when session has too few signals.
+- **Save/unsave POIs** — `/api/moment/save` route writes to `anonymous_session.saved_pois`; Discover feed has a save tray.
+- **Wej feed** — scored-and-ranked POI cards with collapsed/expanded states and source attribution.
+
+### Fixes
+
+- Discover themes route now honours cold-start mood override.
+- Slugify free-text steer; surface themes-fetch errors with user-visible message; a11y fixes on save button.
+- Stable save `aria-label`, deduplicated city display, null-photo guard.
+- Session cookie linked correctly to Moment sign-up.
+
 ## [v0.6.0] — 2026-05-18
 
 ### Features

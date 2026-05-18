@@ -15,6 +15,7 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 | Map | Leaflet (marketing) + MapLibre GL JS globe (Moment Site); CartoDB Positron tiles; `ssr: false` dynamic import |
 | Fonts | Fraunces (variable, axes: opsz/SOFT/WONK) + Inter via `next/font/google` |
 | Colour | OKLCH perceptual scale — canvas, clay (#C56A3F), sage, ink |
+| Auth | Better-Auth v1.6 + Drizzle adapter (`traveller_*` tables) + custom passkey plugin (`@simplewebauthn/server` v13) |
 | Testing | Vitest + React Testing Library (`npm test`) |
 
 ## Pages
@@ -26,6 +27,9 @@ Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/re
 | `/pricing` | `app/(marketing)/pricing/page.tsx` | Free/Premium cards, comparison table, billing toggle, FAQ |
 | `/ambassadors` | `app/(marketing)/ambassadors/page.tsx` | Ambassador programme hero, perks, apply form |
 | `/moment` | `app/moment/page.tsx` | Traveller onboarding — 5-stage Hoku-led interview producing the Mana (Digital Twin) |
+| `/discover` | `app/discover/page.tsx` | Destination discovery — mood/theme filtering, cluster cards, map |
+| `/home` | `app/home/page.tsx` | Traveller home (auth-gated) — Hoku greeting, visited countries, Explorer Badge, saved places |
+| `/portal` | `app/portal/page.tsx` | Ambassador portal (auth-gated, ambassador role required) — stats, content tools |
 | `/sign-in` | `app/sign-in/page.tsx` | Authentication — sign in or create account; passkey (WebAuthn/FIDO2) + email/password fallback |
 | `*` | `app/not-found.tsx` | 404 — "This page doesn't exist. Yet." |
 
@@ -47,6 +51,8 @@ The Moment flow is backed by four API routes under `app/api/moment/` — `sessio
 | Variable | Purpose |
 |---|---|
 | `NEXT_PUBLIC_PASSKEY_RP_ID` | WebAuthn relying-party domain. Defaults to `window.location.hostname`. Set to `ohana.place` in production before launching passkey registration — credentials are domain-bound and cannot be migrated. |
+| `NEXT_PUBLIC_SITE_ORIGIN` | Full origin used by the passkey plugin for WebAuthn verification (e.g. `https://ohana.place`). Defaults to `https://${NEXT_PUBLIC_PASSKEY_RP_ID}`. |
+| `DATABASE_URL` | PostgreSQL connection string for the Drizzle adapter (traveller auth tables). Same DB as the Moment API. |
 
 ## Dev
 

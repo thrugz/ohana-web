@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   if (!isUuid(sessionId)) {
     return NextResponse.json({ error: "Invalid sessionId" }, { status: 400 })
   }
-  if (typeof poiId !== "string" || !poiId) {
+  if (!isUuid(poiId)) {
     return NextResponse.json({ error: "Invalid poiId" }, { status: 400 })
   }
 

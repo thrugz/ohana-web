@@ -22,5 +22,9 @@ export async function POST(req: Request) {
     mode as HokuMode,
     payload && typeof payload === "object" ? (payload as Record<string, unknown>) : {},
   )
-  return NextResponse.json({ reply })
+  // portrait mode: key as "portrait" so Stage 4 reads data.portrait directly.
+  // reflect mode: key as "reply" so Stage 2 reads data.reply.
+  return mode === "portrait"
+    ? NextResponse.json({ portrait: reply })
+    : NextResponse.json({ reply })
 }
