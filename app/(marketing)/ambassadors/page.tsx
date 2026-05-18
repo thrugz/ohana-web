@@ -4,6 +4,12 @@ import { useRef, useState } from "react"
 import Image from "next/image"
 import { motion, useInView, AnimatePresence } from "motion/react"
 import { SiteFooter } from "../_components/SiteFooter"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 // ---------------------------------------------------------------------------
 // Shared motion helpers
@@ -117,8 +123,9 @@ function HeroContent() {
         className="mb-10 max-w-xl text-[16px] leading-relaxed"
         style={{ color: "rgba(255,255,255,0.6)" }}
       >
-        The Ohana Ambassador Programme — for the travellers who were recommending the good stuff
-        long before it was cool.
+        When your knowledge of a place helps a traveller plan their trip, you get paid. When they
+        sign up because of you, you get paid. And for Anchor partners, we put a floor under all
+        of it — guaranteed, in writing.
       </motion.p>
 
       {/* CTA */}
@@ -273,7 +280,7 @@ const perksCards = [
     id: "poi",
     icon: "✦",
     title: "POI usage revenue.",
-    body: "20% of every paid itinerary goes to a creator pool, split across the POIs used. First upload owns it, in perpetuity.",
+    body: "20% of every paid itinerary is set aside as a Creator Pool — split across the POIs used in that trip. A €49 Tour Plan generates €9.45 in creator earnings. Your share scales with your contribution.",
     bg: "var(--color-clay-soft)",
     dark: false,
   },
@@ -281,7 +288,7 @@ const perksCards = [
     id: "referral",
     icon: "◎",
     title: "Referral commissions.",
-    body: "€5 on every Tour Plan, €8 on every annual subscription your audience brings in. 30-day cookie, first-touch attribution.",
+    body: "€5 on every Tour Plan, €8 on every Aloha Pass annual subscription your audience brings in. Paid monthly after the refund window. Stacks on top of your POI revenue.",
     bg: "var(--color-ink)",
     dark: true,
   },
@@ -289,7 +296,7 @@ const perksCards = [
     id: "guarantee",
     icon: "◈",
     title: "€750 Anchor guarantee.",
-    body: "Publish 200+ POIs within 90 days and become an Anchor. We guarantee €750 in your first year — we pay the gap if you fall short.",
+    body: "Publish 200+ POIs within 90 days and we guarantee €750 in your first year. If your earnings fall short, we cover the gap. No clawbacks if you earn more.",
     bg: "var(--color-sage-soft)",
     dark: false,
   },
@@ -507,7 +514,398 @@ function HowToJoin() {
 }
 
 // ---------------------------------------------------------------------------
-// 5. ApplicationForm
+// 5. EarningsTable
+// ---------------------------------------------------------------------------
+
+function EarningsTable() {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-15% 0px" })
+
+  const rows = [
+    { label: "Your POIs used in 200 Tour Plans", amount: "€486" },
+    { label: "Your POIs used in 30 annual subscriber itineraries", amount: "€39" },
+    { label: "40 Tour Plan referrals from your audience", amount: "€200" },
+    { label: "20 Aloha Pass referrals from your audience", amount: "€160" },
+  ]
+
+  return (
+    <section
+      ref={ref}
+      className="border-b border-[var(--color-line)] px-8 py-20 md:px-20"
+      style={{ background: "var(--color-canvas)" }}
+    >
+      <motion.p
+        initial={{ opacity: 0, y: 16 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0, duration: 0.45, ease: EASE_OUT }}
+        className="mb-3 text-[11px] uppercase tracking-widest"
+        style={{ color: "var(--color-muted)" }}
+      >
+        What this looks like in practice
+      </motion.p>
+
+      <motion.h2
+        initial={{ opacity: 0, y: 24 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.1, duration: 0.55, ease: EASE_OUT }}
+        className="mb-4"
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontVariationSettings: '"opsz" 72',
+          fontWeight: 400,
+          fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+          lineHeight: 1.15,
+          letterSpacing: "-0.02em",
+          color: "var(--color-ink)",
+        }}
+      >
+        A real number, not a best case.
+      </motion.h2>
+
+      <motion.p
+        initial={{ opacity: 0, y: 16 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.18, duration: 0.45, ease: EASE_OUT }}
+        className="mb-12 max-w-xl text-[15px] leading-relaxed"
+        style={{ color: "var(--color-muted)" }}
+      >
+        A Portugal Anchor with 514 POIs, at a walk pace — not an optimistic scenario.
+        In a slower launch, the guarantee covers you to €750. In a stronger year, the upside is uncapped.
+      </motion.p>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.25, duration: 0.5, ease: EASE_OUT }}
+        className="mx-auto max-w-xl overflow-hidden rounded-2xl border border-[var(--color-line)]"
+        style={{ background: "white" }}
+      >
+        {rows.map((row, i) => (
+          <div
+            key={i}
+            className="flex items-center justify-between border-b border-[var(--color-line)] px-6 py-4 last:border-0"
+          >
+            <span className="text-[14px] leading-snug" style={{ color: "var(--color-muted)" }}>
+              {row.label}
+            </span>
+            <span
+              className="ml-6 shrink-0 text-[15px]"
+              style={{ fontFamily: "var(--font-serif)", fontWeight: 400, color: "var(--color-ink)" }}
+            >
+              {row.amount}
+            </span>
+          </div>
+        ))}
+        <div className="flex items-center justify-between px-6 py-5" style={{ background: "var(--color-clay-soft)" }}>
+          <span
+            className="text-[15px]"
+            style={{ fontFamily: "var(--font-serif)", fontWeight: 400, color: "var(--color-ink)" }}
+          >
+            Year 1 total
+          </span>
+          <span
+            className="text-[22px]"
+            style={{
+              fontFamily: "var(--font-serif)",
+              fontVariationSettings: '"opsz" 40',
+              fontWeight: 400,
+              color: "var(--color-clay)",
+            }}
+          >
+            €885
+          </span>
+        </div>
+      </motion.div>
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// 6. Principles
+// ---------------------------------------------------------------------------
+
+function Principles() {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-15% 0px" })
+
+  const dontAsk = [
+    "No exclusivity. Keep publishing on Rexby, your blog, Instagram, wherever you already are.",
+    "No quotas. 200 POIs gets you Anchor status. We don't ask for more.",
+    "No mandated promotion. Sharing Ohana is your choice — it just happens to pay well when you do.",
+  ]
+
+  const doAsk = [
+    "Authentic POIs. The places you'd actually send a friend.",
+    "Honest descriptions. We're building trust, not SEO.",
+    "A 3-month pilot. Either of us can walk at the end with no questions.",
+  ]
+
+  return (
+    <section
+      ref={ref}
+      className="border-b border-[var(--color-line)] px-8 py-20 md:px-20"
+    >
+      <div className="grid gap-16 md:grid-cols-2 md:gap-20">
+        <div>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0, duration: 0.45, ease: EASE_OUT }}
+            className="mb-3 text-[11px] uppercase tracking-widest"
+            style={{ color: "var(--color-muted)" }}
+          >
+            What we don&apos;t ask
+          </motion.p>
+          <ul className="space-y-4">
+            {dontAsk.map((item, i) => (
+              <motion.li
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.1 + i * 0.1, duration: 0.45, ease: EASE_OUT }}
+                className="flex items-start gap-3 text-[15px] leading-relaxed"
+                style={{ color: "var(--color-muted)" }}
+              >
+                <span style={{ color: "var(--color-clay)", marginTop: 3 }}>—</span>
+                {item}
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.1, duration: 0.45, ease: EASE_OUT }}
+            className="mb-3 text-[11px] uppercase tracking-widest"
+            style={{ color: "var(--color-muted)" }}
+          >
+            What we ask
+          </motion.p>
+          <ul className="space-y-4">
+            {doAsk.map((item, i) => (
+              <motion.li
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                animate={inView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.2 + i * 0.1, duration: 0.45, ease: EASE_OUT }}
+                className="flex items-start gap-3 text-[15px] leading-relaxed"
+                style={{ color: "var(--color-muted)" }}
+              >
+                <span style={{ color: "var(--color-clay)", marginTop: 3 }}>—</span>
+                {item}
+              </motion.li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* IP note */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.45, duration: 0.5, ease: EASE_OUT }}
+        className="mt-16 rounded-2xl border border-[var(--color-line)] px-8 py-6"
+        style={{ background: "var(--color-canvas)" }}
+      >
+        <p className="mb-1 text-[11px] uppercase tracking-widest" style={{ color: "var(--color-muted)" }}>
+          Your content stays yours
+        </p>
+        <p className="text-[15px] leading-relaxed" style={{ color: "var(--color-ink)" }}>
+          You keep full ownership of everything you upload. We get a perpetual licence to use
+          your POIs inside Ohana — and we promise never to sublicense your content to anyone else
+          without your written consent. Remove your POIs anytime; we honour it within 30 days.
+        </p>
+      </motion.div>
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// 7. PaymentSchedule
+// ---------------------------------------------------------------------------
+
+const paymentRows = [
+  { stream: "POI usage", timing: "Monthly", note: "Direct to your bank via Mollie" },
+  { stream: "Referral commissions", timing: "Monthly, after refund window", note: "14 days Tour Plan · 30 days annual" },
+  { stream: "Anchor guarantee top-up", timing: "Year-end", note: "If total falls below €750" },
+]
+
+function PaymentSchedule() {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-15% 0px" })
+
+  return (
+    <section
+      ref={ref}
+      className="border-b border-[var(--color-line)] px-8 py-20 md:px-20"
+      style={{ background: "var(--color-canvas)" }}
+    >
+      <motion.p
+        initial={{ opacity: 0, y: 16 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0, duration: 0.45, ease: EASE_OUT }}
+        className="mb-3 text-[11px] uppercase tracking-widest"
+        style={{ color: "var(--color-muted)" }}
+      >
+        When you get paid
+      </motion.p>
+
+      <motion.h2
+        initial={{ opacity: 0, y: 24 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.1, duration: 0.55, ease: EASE_OUT }}
+        className="mb-10"
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontVariationSettings: '"opsz" 72',
+          fontWeight: 400,
+          fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+          lineHeight: 1.15,
+          letterSpacing: "-0.02em",
+          color: "var(--color-ink)",
+        }}
+      >
+        Monthly payouts. No waiting.
+      </motion.h2>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.2, duration: 0.5, ease: EASE_OUT }}
+        className="mx-auto max-w-2xl overflow-hidden rounded-2xl border border-[var(--color-line)]"
+        style={{ background: "white" }}
+      >
+        {paymentRows.map((row, i) => (
+          <div
+            key={i}
+            className="grid grid-cols-3 gap-4 border-b border-[var(--color-line)] px-6 py-4 last:border-0"
+          >
+            <span className="text-[14px] font-medium" style={{ color: "var(--color-ink)" }}>
+              {row.stream}
+            </span>
+            <span className="text-[14px]" style={{ color: "var(--color-muted)" }}>
+              {row.timing}
+            </span>
+            <span className="text-[13px]" style={{ color: "var(--color-muted)" }}>
+              {row.note}
+            </span>
+          </div>
+        ))}
+      </motion.div>
+
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ delay: 0.4, duration: 0.4, ease: EASE_OUT }}
+        className="mt-4 text-[13px]"
+        style={{ color: "var(--color-muted)" }}
+      >
+        Minimum payout €50. Anything below carries to the following month.
+      </motion.p>
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// 8. AmbassadorFAQ
+// ---------------------------------------------------------------------------
+
+const AMBASSADOR_FAQS = [
+  {
+    q: "What if my POIs get deleted from the platform?",
+    a: "We notify you 14 days before any removal. POIs only get removed if they fail our quality bar — closures, factual errors, plagiarism, or content that doesn't fit the Ohana standard. You can always upload corrected versions.",
+  },
+  {
+    q: "Can I see how my POIs are performing?",
+    a: "Yes. Every Ambassador gets an analytics dashboard showing usage, earnings, and referral activity.",
+  },
+  {
+    q: "What happens if I drop below 200 POIs as an Anchor?",
+    a: "You stay an Ambassador, just not an Anchor. The minimum guarantee no longer applies, but POI earnings and referrals continue. You can climb back to Anchor by publishing more.",
+  },
+  {
+    q: "Is Ohana related to Rexby?",
+    a: "No. Many of our first Ambassadors came from Rexby's creator community — but we're a different product. Rexby sells guides. Ohana builds personalised itineraries from the POIs creators contribute. Both can coexist; we don't ask you to choose.",
+  },
+  {
+    q: "When does my content earn me money?",
+    a: "The moment one of your POIs appears in a paid itinerary. We track every usage and credit you for it.",
+  },
+  {
+    q: "Can I still publish on Rexby, my blog, or Instagram?",
+    a: "Yes — and please do. There's no exclusivity in this partnership. Your content is yours to publish wherever you already do.",
+  },
+]
+
+function AmbassadorFAQ() {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-15% 0px" })
+
+  return (
+    <section
+      ref={ref}
+      className="border-b border-[var(--color-line)] px-8 py-20 md:px-20"
+    >
+      <motion.p
+        initial={{ opacity: 0, y: 16 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0, duration: 0.45, ease: EASE_OUT }}
+        className="mb-3 text-[11px] uppercase tracking-widest"
+        style={{ color: "var(--color-muted)" }}
+      >
+        Questions
+      </motion.p>
+
+      <motion.h2
+        initial={{ opacity: 0, y: 24 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.1, duration: 0.55, ease: EASE_OUT }}
+        className="mb-12"
+        style={{
+          fontFamily: "var(--font-serif)",
+          fontVariationSettings: '"opsz" 72',
+          fontWeight: 400,
+          fontSize: "clamp(1.8rem, 3.5vw, 2.8rem)",
+          lineHeight: 1.15,
+          letterSpacing: "-0.02em",
+          color: "var(--color-ink)",
+        }}
+      >
+        Common questions.
+      </motion.h2>
+
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ delay: 0.2, duration: 0.5, ease: EASE_OUT }}
+      >
+        <Accordion className="mx-auto max-w-2xl divide-y divide-[var(--color-line)]">
+          {AMBASSADOR_FAQS.map((faq, i) => (
+            <AccordionItem key={i} value={`faq-${i}`} className="border-0">
+              <AccordionTrigger
+                className="py-5 text-left text-[15px] font-medium hover:no-underline"
+                style={{ color: "var(--color-ink)" }}
+              >
+                {faq.q}
+              </AccordionTrigger>
+              <AccordionContent
+                className="pb-5 text-[15px] leading-relaxed"
+                style={{ color: "var(--color-muted)" }}
+              >
+                {faq.a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </motion.div>
+    </section>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// 9. ApplicationForm
 // ---------------------------------------------------------------------------
 
 type FormState = "idle" | "loading" | "success"
@@ -801,7 +1199,11 @@ export default function AmbassadorsPage() {
       <PageHero />
       <WhatIsAmbassador />
       <PerksGrid />
+      <EarningsTable />
       <HowToJoin />
+      <Principles />
+      <PaymentSchedule />
+      <AmbassadorFAQ />
       <ApplicationForm />
       <SiteFooter />
     </>
