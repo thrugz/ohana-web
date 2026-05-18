@@ -1,5 +1,5 @@
 import { expect, test } from "vitest"
-import { buildWejQuery, firstPhotoUrl, isThinWej, rowToCard } from "./route"
+import { buildWejQuery, buildWejQueryBiased, firstPhotoUrl, isThinWej, rowToCard } from "./route"
 
 test("buildWejQuery filters poi_final by mood AND theme, caps 14, ranks by confidence", () => {
   const { text, values } = buildWejQuery("serene", "food")
@@ -77,4 +77,16 @@ test("rowToCard defaults null short_description, source_id, city_name", () => {
   expect(card.source).toBe("unknown")
   expect(card.city).toBeNull()
   expect(card.photoUrl).toBeNull()
+})
+
+test("buildWejQueryBiased adds OR branch for preferred moods", () => {
+  const { text, values } = buildWejQueryBiased("serene", "food", ["calm", "adventurous"])
+  expect(text).toMatch(/moods @> \$1 OR moods && \$3/i)
+  expect(values[2]).toEqual(["calm", "adventurous"])
+})
+
+test("buildWejQueryBiased with empty preferred moods behaves like basic query", () => {
+  const { text, values } = buildWejQueryBiased("serene", "food", [])
+  expect(text).not.toMatch(/OR moods/)
+  expect(values).toHaveLength(2)
 })

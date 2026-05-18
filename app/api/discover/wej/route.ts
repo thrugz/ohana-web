@@ -8,6 +8,8 @@ import { NextResponse } from "next/server"
 import { titleCaseSlug } from "@/lib/discover/slug"
 import type { WejCard } from "@/lib/discover/types"
 import { getPool } from "@/lib/moment/db"
+import { getTwinSession } from "@/lib/auth/session"
+import { getProfile } from "@/lib/twin/profile"
 
 const DEPTH_MIN = 6
 const WEJ_CAP = 14
@@ -43,6 +45,26 @@ export function buildWejQuery(mood: string, theme: string): { text: string; valu
     LIMIT ${WEJ_CAP}
   `
   return { text, values: [[mood], [theme]] }
+}
+
+export function buildWejQueryBiased(
+  mood: string,
+  theme: string,
+  preferredMoods: string[],
+): { text: string; values: (string | string[])[] } {
+  if (preferredMoods.length === 0) {
+    return buildWejQuery(mood, theme)
+  }
+  const text = `
+    SELECT id, name, short_description, photos, source_id, city_name
+    FROM poi_final
+    WHERE (moods @> $1 OR moods && $3)
+      AND themes @> $2
+      AND operational_status = 'active'
+    ORDER BY confidence_score DESC NULLS LAST
+    LIMIT ${WEJ_CAP}
+  `
+  return { text, values: [[mood], [theme], preferredMoods] }
 }
 
 // poi_final.photos is JSONB defaulting to '[]'. The element shape is not
@@ -87,20 +109,29 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "mood and theme are required" }, { status: 400 })
   }
 
-  const { text, values } = buildWejQuery(mood, theme)
+  let preferredMoods: string[] = []
+  try {
+    const session = await getTwinSession()
+    if (session?.user?.id) {
+      const profile = await getProfile(session.user.id)
+      preferredMoods = profile?.preferredMoods ?? []
+    }
+  } catch {
+    // Silently fall back to no biasing.
+  }
+
+  const { text, values } = buildWejQueryBiased(mood, theme, preferredMoods)
 
   let cards: WejCard[] = []
   try {
     const result = await getPool().query<PoiFinalRow>(text, values)
     cards = result.rows.map((row) => rowToCard(row, mood, theme))
   } catch {
-    // poi_final unavailable — treat as an empty (thin) Wej rather than 500ing.
     cards = []
   }
 
   const title = titleCaseSlug(theme)
 
-  // Depth guard: too few cards to make a worthwhile Wej.
   if (isThinWej(cards.length)) {
     return NextResponse.json({ mood, theme, title, thin: true, cards })
   }
