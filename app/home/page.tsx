@@ -5,6 +5,8 @@ import { countryImage, COUNTRY_PLACEHOLDER } from "@/lib/twin/countryImages"
 import { getTwinSession } from "@/lib/auth/session"
 import { HokuMessage } from "@/components/moment/HokuMessage"
 import { HokuThread } from "@/components/moment/HokuThread"
+import { listItineraries } from "@/lib/plan/db"
+import type { ItinerarySummary } from "@/lib/plan/types"
 
 export default async function HomePage() {
   const session = await getTwinSession()
@@ -12,6 +14,9 @@ export default async function HomePage() {
   const userName = session?.user?.name ?? null
 
   const greetingText = greeting(new Date(), userName?.split(" ")[0])
+  const itineraries: ItinerarySummary[] = session?.user?.id
+    ? await listItineraries(session.user.id)
+    : []
 
   return (
     <div className="mx-auto max-w-5xl px-4 pb-20 pt-8">
@@ -152,28 +157,67 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── Your journeys (stub) ── */}
+      {/* ── Your journeys ── */}
       <section className="mt-10 px-4">
-        <h2 className="text-[11px] uppercase tracking-widest text-muted mb-4">Your journeys</h2>
-        <div
-          className="rounded-xl border border-line p-8 text-center"
-          style={{ background: "var(--color-surface)" }}
-        >
-          <p
-            style={{
-              fontFamily: "var(--font-serif)",
-              fontWeight: 400,
-              fontVariationSettings: '"opsz" 72',
-              fontSize: "1.25rem",
-              color: "var(--color-ink)",
-            }}
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-[11px] uppercase tracking-widest text-muted">Your journeys</h2>
+          <a
+            href="/plan"
+            className="text-[11px] underline underline-offset-2 hover:text-ink transition-colors"
+            style={{ color: "var(--color-muted)" }}
           >
-            Your adventures are being woven together.
-          </p>
-          <p className="mt-2 text-sm text-muted">
-            Full trip archives and day-by-day itineraries are coming in a future update.
-          </p>
+            Plan a trip
+          </a>
         </div>
+
+        {itineraries.length === 0 ? (
+          <div
+            className="rounded-xl border border-line p-8 text-center"
+            style={{ background: "var(--color-surface)" }}
+          >
+            <p
+              style={{
+                fontFamily: "var(--font-serif)",
+                fontWeight: 400,
+                fontVariationSettings: '"opsz" 72',
+                fontSize: "1.25rem",
+                color: "var(--color-ink)",
+              }}
+            >
+              Your adventures are being woven together.
+            </p>
+            <p className="mt-2 text-sm text-muted">
+              <a
+                href="/plan"
+                className="underline underline-offset-2 hover:text-ink transition-colors"
+              >
+                Build your first itinerary
+              </a>{" "}
+              from your saved places.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {itineraries.map((itin) => (
+              <a
+                key={itin.id}
+                href={`/plan/${itin.id}`}
+                className="flex items-center justify-between rounded-xl border border-line p-4 hover:border-clay transition-colors"
+                style={{ background: "var(--color-surface)" }}
+              >
+                <div>
+                  <p className="font-medium text-ink text-[15px] leading-snug">{itin.title}</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: "var(--color-muted)" }}>
+                    {itin.itemCount} {itin.itemCount === 1 ? "place" : "places"}
+                  </p>
+                </div>
+                <span className="text-[11px]" style={{ color: "var(--color-muted)" }}>
+                  →
+                </span>
+              </a>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* ── Export ── */}
