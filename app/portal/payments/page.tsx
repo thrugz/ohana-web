@@ -42,12 +42,12 @@ export default async function PaymentsPage() {
         </div>
       )}
 
-      {!notConnected && <EarningsData creatorId={record.id} currency="EUR" />}
+      {!notConnected && <EarningsData creatorId={record.id} />}
     </div>
   )
 }
 
-async function EarningsData({ creatorId, currency: _currency }: { creatorId: string; currency: string }) {
+async function EarningsData({ creatorId }: { creatorId: string }) {
   const [summary, earnings, payouts, bookings] = await Promise.all([
     getEarningsSummary(creatorId),
     getRecentEarnings(creatorId),
@@ -56,7 +56,7 @@ async function EarningsData({ creatorId, currency: _currency }: { creatorId: str
   ])
 
   const fmt = (amount: string) =>
-    new Intl.NumberFormat("en-EU", { style: "currency", currency: summary.currency }).format(
+    new Intl.NumberFormat("en-IE", { style: "currency", currency: summary.currency }).format(
       parseFloat(amount),
     )
 
@@ -172,7 +172,7 @@ const STATUS_COLORS: Record<string, string> = {
   paid: "bg-line text-muted",
   pending: "bg-clay-soft text-clay",
   processing: "bg-clay-soft text-clay",
-  failed: "bg-red-100 text-red-700",
+  failed: "bg-clay-soft text-clay",
   confirmed: "bg-sage-soft text-sage",
   cancelled: "bg-line text-muted",
 }
