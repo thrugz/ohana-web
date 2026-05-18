@@ -1,4 +1,4 @@
-import { getPool } from "@/lib/moment/db"
+import { getPool, isUuid } from "@/lib/moment/db"
 import type { Itinerary, ItineraryItem, ItinerarySummary } from "./types"
 
 interface PoiRow {
@@ -49,9 +49,11 @@ export async function createItinerary(
   poiIds: string[],
   days: number,
 ): Promise<string> {
+  if (!isUuid(ownerUserId)) throw new Error("invalid UUID: ownerUserId")
+
   const pool = getPool()
 
-  // Fetch POIs from poi_final to get city and confidence info
+  // Fetch POIs from poi_final to get city and confidence info (read-only, outside transaction)
   const poiResult = await pool.query<PoiRow>(
     `SELECT id, name, short_description, photos, city_name, poi_type, confidence_score
      FROM poi_final
@@ -69,33 +71,48 @@ export async function createItinerary(
 
   const poisPerDay = Math.max(1, Math.ceil(pois.length / days))
 
-  const itinResult = await pool.query<{ id: string }>(
-    `INSERT INTO itinerary (owner_user_id, title, status)
-     VALUES ($1, $2, 'draft')
-     RETURNING id`,
-    [ownerUserId, title],
-  )
-  const itineraryId = itinResult.rows[0].id
+  const client = await pool.connect()
+  try {
+    await client.query("BEGIN")
 
-  if (pois.length > 0) {
-    const placeholders: string[] = []
-    const vals: unknown[] = []
-    pois.forEach((poi, i) => {
-      const dayIndex = Math.floor(i / poisPerDay)
-      const base = i * 4
-      placeholders.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4})`)
-      vals.push(itineraryId, poi.id, dayIndex, i)
-    })
-    await pool.query(
-      `INSERT INTO itinerary_item (itinerary_id, poi_id, day_index, sort_order) VALUES ${placeholders.join(", ")}`,
-      vals,
+    const itinResult = await client.query<{ id: string }>(
+      `INSERT INTO itinerary (owner_user_id, title, status)
+       VALUES ($1, $2, 'draft')
+       RETURNING id`,
+      [ownerUserId, title],
     )
-  }
+    const itineraryId = itinResult.rows[0].id
 
-  return itineraryId
+    if (pois.length > 0) {
+      const COL_COUNT = 4 // itinerary_id, poi_id, day_index, sort_order
+      const placeholders: string[] = []
+      const vals: unknown[] = []
+      pois.forEach((poi, i) => {
+        const dayIndex = Math.floor(i / poisPerDay)
+        const base = i * COL_COUNT
+        placeholders.push(`($${base + 1}, $${base + 2}, $${base + 3}, $${base + 4})`)
+        vals.push(itineraryId, poi.id, dayIndex, i)
+      })
+      await client.query(
+        `INSERT INTO itinerary_item (itinerary_id, poi_id, day_index, sort_order) VALUES ${placeholders.join(", ")}`,
+        vals,
+      )
+    }
+
+    await client.query("COMMIT")
+    return itineraryId
+  } catch (e) {
+    await client.query("ROLLBACK")
+    throw e
+  } finally {
+    client.release()
+  }
 }
 
 export async function getItinerary(id: string, ownerUserId: string): Promise<Itinerary | null> {
+  if (!isUuid(id)) throw new Error("invalid UUID: id")
+  if (!isUuid(ownerUserId)) throw new Error("invalid UUID: ownerUserId")
+
   const pool = getPool()
 
   const itinResult = await pool.query<ItineraryRow>(
@@ -149,6 +166,8 @@ export async function getItinerary(id: string, ownerUserId: string): Promise<Iti
 }
 
 export async function listItineraries(userId: string): Promise<ItinerarySummary[]> {
+  if (!isUuid(userId)) throw new Error("invalid UUID: userId")
+
   const result = await getPool().query<{
     id: string
     title: string
