@@ -383,7 +383,7 @@ function TeamNote() {
           fontFamily: "var(--font-sans)",
         }}
       >
-        We&apos;re a small team spread across Copenhagen, Lisbon, and Tokyo. We&apos;re
+        We&apos;re a small team based in Copenhagen. We&apos;re
         engineers, writers, and compulsive travellers. We think the best products
         are made by people who actually use them.
       </motion.p>
@@ -395,10 +395,6 @@ function TeamNote() {
         style={{ color: "var(--color-muted)", fontFamily: "var(--font-sans)" }}
       >
         <span>Copenhagen</span>
-        <span style={{ opacity: 0.4 }}>·</span>
-        <span>Lisbon</span>
-        <span style={{ opacity: 0.4 }}>·</span>
-        <span>Tokyo</span>
       </motion.div>
     </section>
   )
