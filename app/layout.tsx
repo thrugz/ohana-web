@@ -4,6 +4,7 @@ import "./globals.css"
 import { CustomCursor } from "@/components/CustomCursor"
 import { FeedbackWidget } from "@/components/FeedbackWidget"
 import { ScrollReveal } from "@/components/ScrollReveal"
+import { getTwinSession } from "@/lib/auth/session"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,17 +31,18 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const session = await getTwinSession()
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <body>
         <CustomCursor />
         <ScrollReveal />
-        <FeedbackWidget />
+        {session?.user?.id && <FeedbackWidget />}
         {children}
       </body>
     </html>
