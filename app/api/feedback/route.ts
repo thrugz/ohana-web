@@ -1,10 +1,18 @@
 import { LinearClient } from "@linear/sdk"
 import { NextResponse } from "next/server"
+import { getTwinSession } from "@/lib/auth/session"
 
 const APP_LABEL = "web"
+// PROJECT_ID is hardcoded here. Moving it to an env var is tracked as A-11
+// in the 2026-05-19 audit (no Linear ticket — cosmetic, low urgency).
 const PROJECT_ID = "343b1877-dc98-4700-9a05-b7458014fd27"
 
 export async function POST(req: Request) {
+  const session = await getTwinSession()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorised" }, { status: 401 })
+  }
+
   const apiKey = process.env.LINEAR_API_KEY
   const teamId = process.env.LINEAR_TEAM_ID
 

@@ -14,9 +14,10 @@ export interface ClusterCard {
   image: string
 }
 
-// TODO(@bram): the full mood-slug -> cluster mapping should be derived from
-// the canonical 47-mood registry. The slugs below cover the Stage 2 image
-// set plus representative slugs for the remaining clusters.
+// The full mood-slug -> cluster mapping should be derived from the canonical
+// 47-mood registry. The slugs below cover the Stage 2 image set plus
+// representative slugs for the remaining clusters. Tracked as A-07 in the
+// 2026-05-19 audit (no Linear ticket yet — low urgency, cosmetic only).
 export const MOOD_CLUSTERS: MoodCluster[] = [
   { id: "calm_reflective",      title: "Calm & Reflective",      moods: ["serene", "reflective", "slow_paced", "relaxed"] },
   { id: "energetic_social",     title: "Energetic & Social",     moods: ["social", "joyful", "vibrant"] },

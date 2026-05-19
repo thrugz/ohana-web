@@ -6,51 +6,8 @@ import Image from "next/image"
 import { Fingerprint } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
 import { useRouter } from "next/navigation"
-import { startRegistration, startAuthentication } from "@simplewebauthn/browser"
 import { authClient } from "@/lib/auth/client"
-
-// ── WebAuthn passkey helpers ──────────────────────────────────────────────────
-
-async function passkeyRegister(email: string, name: string): Promise<boolean> {
-  if (!window.PublicKeyCredential) return false
-
-  const optRes = await fetch("/api/auth/passkey/register-options", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  })
-  if (!optRes.ok) return false
-  const options = await optRes.json()
-
-  const credential = await startRegistration({ optionsJSON: options })
-
-  const regRes = await fetch("/api/auth/passkey/register", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, name, credential }),
-  })
-  return regRes.ok
-}
-
-async function passkeyAuthenticate(): Promise<boolean> {
-  if (!window.PublicKeyCredential) return false
-
-  const optRes = await fetch("/api/auth/passkey/auth-options", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  })
-  if (!optRes.ok) return false
-  const { challengeId, ...options } = await optRes.json()
-
-  const credential = await startAuthentication({ optionsJSON: options })
-
-  const authRes = await fetch("/api/auth/passkey/authenticate", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ challengeId, credential }),
-  })
-  return authRes.ok
-}
+import { passkeyRegister, passkeyAuthenticate } from "@/lib/auth/passkey-client"
 
 // ── FloatingInput ─────────────────────────────────────────────────────────────
 

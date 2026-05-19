@@ -1,6 +1,6 @@
 # ohana-web
 
-Marketing site and traveller onboarding for [Ohana](https://ohana.travel) — a travel companion that knows who you are.
+Marketing site and traveller onboarding for [Ohana](https://ohana.place) — a travel companion that knows who you are.
 
 Built on Next.js 16, Tailwind CSS v4, shadcn/ui (base-ui), and Motion (motion/react). Warm Scandinavian editorial aesthetic: OKLCH colour tokens, Fraunces variable font, spring physics throughout.
 
@@ -39,7 +39,7 @@ The Moment flow is backed by four API routes under `app/api/moment/` — `sessio
 
 Twin profile API: `PATCH /api/twin/profile` (upsert visited countries / preferred moods / themes into `traveller_profile`), `GET /api/twin/export` (download JSON report). Discovery biasing: `GET /api/discover/wej` widens results with `OR moods && $preferred_moods` when the authenticated user has profile preferences.
 
-Itinerary API: `POST /api/plan/generate` (deterministic bin-packing itinerary from a destination list), `GET /api/plan/[id]` (fetch itinerary), `POST /api/plan/[id]/send` (email itinerary via Resend).
+Itinerary API: `POST /api/plan/generate` (deterministic bin-packing itinerary from a destination list), `GET /api/plan/[id]` (fetch itinerary), `POST /api/plan/[id]/send` (email itinerary via Brevo SMTP).
 
 Creator portal API: `POST /api/portal/guides/import` (CSV upload — parses, validates, bulk-inserts valid rows into `raw_pois` with `ON CONFLICT (source, source_id) DO NOTHING` deduplication).
 
@@ -61,6 +61,20 @@ Creator portal API: `POST /api/portal/guides/import` (CSV upload — parses, val
 | `NEXT_PUBLIC_PASSKEY_RP_ID` | WebAuthn relying-party domain. Defaults to `window.location.hostname`. Set to `ohana.place` in production before launching passkey registration — credentials are domain-bound and cannot be migrated. |
 | `NEXT_PUBLIC_SITE_ORIGIN` | Full origin used by the passkey plugin for WebAuthn verification (e.g. `https://ohana.place`). Defaults to `https://${NEXT_PUBLIC_PASSKEY_RP_ID}`. |
 | `DATABASE_URL` | PostgreSQL connection string for the Drizzle adapter (traveller auth tables). Same DB as the Moment API. |
+| `DATABASE_SSL` | Set to `disable` in local dev when tunnelling; omit in production (SSL is on by default). |
+| `BREVO_SMTP_HOST` | Brevo SMTP hostname (e.g. `smtp-relay.brevo.com`). |
+| `BREVO_SMTP_PORT` | Brevo SMTP port (`587` for STARTTLS). |
+| `BREVO_SMTP_USER` | Brevo SMTP login (your Brevo account email). |
+| `BREVO_SMTP_PASS` | Brevo SMTP API key / password. |
+| `BREVO_API_KEY` | Brevo REST API key (used by the transactional email client). |
+| `MOLLIE_CLIENT_ID` | Mollie OAuth app client ID (set in Mollie partner dashboard). |
+| `MOLLIE_CLIENT_SECRET` | Mollie OAuth app client secret. |
+| `MOLLIE_REDIRECT_URI` | Full callback URL registered in Mollie: `https://ohana.place/api/portal/mollie/callback`. |
+| `MOLLIE_WEBHOOK_SECRET` | HMAC secret for verifying `POST /api/portal/mollie/webhook` payloads. Set in Coolify after registering the webhook URL in Mollie. |
+| `LINEAR_API_KEY` | Linear personal or service API key (used by the feedback widget and CSV-import audit trail). |
+| `LINEAR_TEAM_ID` | Linear team ID for the Ohana project. |
+| `HAYSTACK_URL` | Base URL for the Hoku agent (ohana-haystack hayhooks endpoint), e.g. `http://localhost:1416`. |
+| `PORTAL_DEV_CREATOR_ID` | Development-only fallback: a real creator UUID to exercise portal UI without a traveller session. Never set in production. |
 
 ## Dev
 

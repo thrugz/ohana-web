@@ -99,7 +99,9 @@ export function Stage4Atlas({ signal, commit, advanceStage }: StageProps) {
         </div>
       </motion.div>
 
-      {/* Soft signup prompt at the emotional peak, before the Continue. */}
+      {/* Soft signup prompt at the emotional peak, before the Continue.
+          Saving records intent and collapses the prompt — the hard signup
+          wall is deferred to the itinerary (spec §5, layered signup). */}
       {portrait !== null && !promptDismissed && (
         <SaveManaPrompt
           onSkip={() => setPromptDismissed(true)}

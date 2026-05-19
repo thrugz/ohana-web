@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import Link from "next/link"
+import { OhanaLogo } from "@/components/OhanaLogo"
 
 const NAV_LINKS = [
   { label: "Pricing", href: "/pricing" },
@@ -12,21 +13,11 @@ const NAV_LINKS = [
 
 export function SiteNav() {
   const [scrolled, setScrolled] = useState(false)
-  const [wiggle, setWiggle] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const crossed = useRef(false)
 
   useEffect(() => {
     const handler = () => {
-      const y = window.scrollY
-      setScrolled(y > 80)
-
-      if (y > window.innerHeight * 0.9 && !crossed.current) {
-        crossed.current = true
-        setWiggle(true)
-        setTimeout(() => setWiggle(false), 500)
-      }
-      if (y < window.innerHeight * 0.5) crossed.current = false
+      setScrolled(window.scrollY > 80)
     }
     window.addEventListener("scroll", handler, { passive: true })
     return () => window.removeEventListener("scroll", handler)
@@ -45,7 +36,6 @@ export function SiteNav() {
   const navBlur = scrolled || mobileOpen ? "blur(12px)" : "none"
   const navBorder = scrolled || mobileOpen ? "1px solid var(--color-line)" : "1px solid transparent"
   const linkColor = scrolled || mobileOpen ? "var(--color-ink)" : "rgba(255,255,255,0.88)"
-  const logoColor = scrolled || mobileOpen ? "var(--color-ink)" : "white"
 
   return (
     <>
@@ -59,26 +49,8 @@ export function SiteNav() {
       >
         <div className="flex h-16 items-center px-8 md:px-12">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 no-underline" onClick={() => setMobileOpen(false)}>
-            <motion.span
-              animate={wiggle ? { rotate: [-8, 5, -3, 0] } : { rotate: -10 }}
-              transition={{ duration: 0.45, ease: [0.34, 1.56, 0.64, 1] }}
-              className="inline-block text-base"
-              style={{ filter: "drop-shadow(0 3px 6px oklch(0.62 0.14 45 / 0.3))" }}
-            >
-              🌺
-            </motion.span>
-            <span
-              className="text-[18px] italic"
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontVariationSettings: '"opsz" 40',
-                color: logoColor,
-                transition: "color 0.3s",
-              }}
-            >
-              Ohana
-            </span>
+          <Link href="/" className="no-underline" onClick={() => setMobileOpen(false)}>
+            <OhanaLogo variant={scrolled || mobileOpen ? "light" : "dark"} />
           </Link>
 
           {/* Desktop centre links */}
