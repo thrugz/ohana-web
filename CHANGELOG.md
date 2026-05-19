@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.11.0] — 2026-05-19
+
+### Features
+- Add Mollie KYC webhook — `POST /api/portal/mollie/webhook` verifies HMAC-SHA256 signatures, dedupes via `mollie_webhook_event`, and flips `creator.payout_enabled` + `kyc_status` on KYC completion (OHA-47)
+- Apply v1 partnership copy to `/ambassadors` — earnings streams, payment schedule, FAQ, principles sections
+- Wire `/ambassadors` application form to `POST /api/ambassadors/apply` — writes to `creator_application`
+
+### Changes
+- Migrate transactional email from Resend to Brevo SMTP (EU data residency) — `nodemailer` over STARTTLS, configured via `BREVO_SMTP_*` env vars
+
 ## [v0.10.0] — 2026-05-19
 
 ### Features
