@@ -19,7 +19,7 @@ const fraunces = Fraunces({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://ohana.travel"),
+  metadataBase: new URL("https://ohana.place"),
   title: "Ohana — Your kind of place, found for you",
   description:
     "Ohana finds the neighborhoods, experiences, and people that match how you actually want to travel.",

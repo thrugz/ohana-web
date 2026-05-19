@@ -11,9 +11,6 @@ interface SaveManaPromptProps {
 // The hard signup wall is deferred to the itinerary (spec §5, layered signup).
 export function SaveManaPrompt({ onSkip, onSave }: SaveManaPromptProps) {
   function handleSave() {
-    // TODO(@bram): wire Better-Auth magic-link/passkey once auth is set up
-    // in ohana-web. Until then "Save it" records intent and proceeds.
-    console.info("[moment] save-mana intent recorded")
     ;(onSave ?? onSkip)()
   }
 

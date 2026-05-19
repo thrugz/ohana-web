@@ -103,7 +103,7 @@ export function Stage4Atlas({ signal, commit, advanceStage }: StageProps) {
       {portrait !== null && !promptDismissed && (
         <SaveManaPrompt
           onSkip={() => setPromptDismissed(true)}
-          onSave={() => setPromptDismissed(true)}
+          onSave={() => { window.location.href = "/sign-in" }}
         />
       )}
 

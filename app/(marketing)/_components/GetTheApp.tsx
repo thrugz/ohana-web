@@ -152,7 +152,7 @@ export function GetTheApp() {
               style={{ background: "white", border: "1px solid var(--color-line)", boxShadow: "0 2px 12px oklch(0.22 0.02 60 / 0.06)" }}
             >
               <QRCodeSVG
-                value="https://ohana.travel/beta"
+                value="https://ohana.place/beta"
                 size={96}
                 fgColor="oklch(0.22 0.02 60)"
                 bgColor="white"

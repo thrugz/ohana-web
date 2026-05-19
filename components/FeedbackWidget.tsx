@@ -4,7 +4,7 @@ import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { toPng } from "html-to-image"
 
-type State = "idle" | "capturing" | "open" | "loading" | "success"
+type State = "idle" | "capturing" | "open" | "loading" | "success" | "unauthenticated"
 
 export function FeedbackWidget() {
   const [state, setState] = useState<State>("idle")
@@ -51,6 +51,10 @@ export function FeedbackWidget() {
         }),
       })
 
+      if (res.status === 401) {
+        setState("unauthenticated")
+        return
+      }
       if (!res.ok) throw new Error("Failed")
 
       setState("success")
@@ -62,7 +66,7 @@ export function FeedbackWidget() {
     }
   }
 
-  const isOpen = state === "open" || state === "loading" || state === "success"
+  const isOpen = state === "open" || state === "loading" || state === "success" || state === "unauthenticated"
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
@@ -85,6 +89,21 @@ export function FeedbackWidget() {
                 <span className="text-2xl">🌺</span>
                 <p className="font-serif text-[var(--color-ink)]">Feedback received</p>
                 <p className="text-sm text-[var(--color-muted)]">We appreciate it.</p>
+              </motion.div>
+            ) : state === "unauthenticated" ? (
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center gap-2 py-4 text-center"
+              >
+                <p className="font-serif text-[var(--color-ink)]">Sign in to send feedback</p>
+                <p className="text-sm text-[var(--color-muted)]">Feedback is available to signed-in travellers.</p>
+                <a
+                  href="/sign-in"
+                  className="mt-2 rounded-full bg-[var(--color-clay)] px-4 py-1.5 text-sm text-white no-underline hover:opacity-90 transition-opacity"
+                >
+                  Sign in
+                </a>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
