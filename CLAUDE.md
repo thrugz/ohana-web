@@ -22,6 +22,15 @@ You are the implementation agent for **ohana-web** — the traveller-facing Next
 
 ## Non-negotiable patterns
 
+### Canonical domain
+- The production domain is `ohana.place`. Never write `ohana.travel` or `ohana.world` anywhere — in code, comments, strings, or docs. Both are stale.
+- `metadataBase` in `app/layout.tsx`, `NEXT_PUBLIC_PASSKEY_RP_ID`, `NEXT_PUBLIC_SITE_ORIGIN`, `MOLLIE_REDIRECT_URI`, and the Brevo sender address must all reference `ohana.place`.
+
+### OhanaLogo
+- Always use `<OhanaLogo />` from `components/OhanaLogo.tsx` wherever the Ohana wordmark appears (nav, footers, auth pages).
+- Use the `variant` prop: `"dark"` for light backgrounds (default), `"light"` for dark/hero backgrounds.
+- Never use plain text, a raw `<img>`, or inline SVG as the logo. This is non-negotiable on every page.
+
 ### Auth
 - `getTwinSession()` → returns session or null, never throws. Use in API routes.
 - `requireTwin()` → redirects to `/sign-in` if not authenticated. Use in `layout.tsx` for auth-gated routes.
@@ -71,7 +80,7 @@ You are the implementation agent for **ohana-web** — the traveller-facing Next
 
 ### Email (Brevo SMTP)
 - Env vars required: `BREVO_SMTP_HOST`, `BREVO_SMTP_PORT`, `BREVO_SMTP_USER`, `BREVO_SMTP_PASS`. If any are absent, `sendItineraryEmail` is a no-op (console.log in dev, returns early). Never throw.
-- Uses `nodemailer` with STARTTLS (port 587, `secure: false`, `requireTLS: true`). Sender: `hello@ohana.travel` / `Ohana`.
+- Uses `nodemailer` with STARTTLS (port 587, `secure: false`, `requireTLS: true`). Sender: `hello@ohana.place` / `Ohana`. (Requires `ohana.place` to be a verified Brevo sending domain — OHA-64.)
 
 ### Dev server
 - Port 3002: `npm run dev -- -p 3002`
