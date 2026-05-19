@@ -1,5 +1,23 @@
 # Changelog
 
+## [v0.12.0] — 2026-05-19
+
+### Features
+- Add `OhanaLogo` component (`components/OhanaLogo.tsx`) — gradient wordmark with `variant` prop for dark/light backgrounds. Replaces plain-text logo links in `SiteNav` and `PortalNav`. (A-12/A-13)
+- Wire Stage 4 "Save it" CTA to inline passkey registration — email field + `passkeyRegister` call appears directly in `SaveManaPrompt`; on success links the anonymous session to the new account and dismisses the prompt. Flow never blocks on failure. (OHA follow-up from audit)
+- Extract `passkeyRegister` and `passkeyAuthenticate` into `lib/auth/passkey-client.ts` — single import source for both `sign-in/page.tsx` and `SaveManaPrompt`
+
+### Fixes
+- Align all production domain references to `ohana.place` — `metadataBase` in `app/layout.tsx`, the QR code URL in `GetTheApp`, and the itinerary email sender and footer link (OHA-57)
+- Gate `POST /api/feedback` behind a session check — anonymous callers now receive 401; `FeedbackWidget` surfaces a "Sign in to send feedback" message rather than failing silently (OHA-59)
+- Mount `FeedbackWidget` only when a session exists — prevents the auth wall from appearing to unauthenticated visitors on public marketing pages
+- Correct team location on `/about` to Copenhagen only (was: Copenhagen, Lisbon, Tokyo)
+- Revert Stage 4 hard `/sign-in` redirect to spec-compliant dismiss behaviour — hard signup gate belongs at the itinerary step per spec §5, not the Stage 4 emotional peak
+
+### Changes
+- Expand README env-var table with `BREVO_SMTP_*`, `MOLLIE_*`, `LINEAR_*`, `HAYSTACK_URL`, and `PORTAL_DEV_CREATOR_ID` (A-02)
+- Fix README itinerary API description from "via Resend" to "Brevo SMTP" (A-01)
+
 ## [v0.11.0] — 2026-05-19
 
 ### Features
